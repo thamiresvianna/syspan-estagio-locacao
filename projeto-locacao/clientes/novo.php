@@ -14,15 +14,8 @@
         $email = trim($_POST["email"] ?? '');
         $telefone = trim($_POST["telefone"] ?? '');
 
-        if(strlen($nome) < 3 || strlen($nome) > 120){
-            $erros[] = "Nome deve conter entre 3 e 120 caracteres.";
-        }
-        if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
-            $erros[] = "E-mail inválido.";
-        }
-        if($telefone === '' || strlen($telefone) < 10){
-            $erros[] = "Telefone inválido.";
-        }
+        $erros = validarCliente($nome, $email, $telefone);
+        
         if(empty($erros)){
             $sql = 'INSERT INTO clientes (nome, email, telefone) VALUES (:nome, :email, :telefone)';
             $stmt = $pdo->prepare($sql);

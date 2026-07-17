@@ -25,12 +25,8 @@
         $diaria = (float) (trim($_POST["diaria"] ?? ''));
         $ativo = isset($_POST["ativo"]) ? 1 : 0;
 
-        if(strlen($descricao) < 3 || strlen($descricao) > 120){
-            $erros[] = "Descrição deve conter entre 3 e 120 caracteres.";
-        }
-        if($diaria <= 0){
-            $erros[] = "Valor da diária inválido. O valor deve ser maior do que 0.";
-        }
+        $erros = validarEquipamento($descricao, $diaria);
+        
         if(empty($erros)){
             $sql = 'UPDATE equipamentos SET descricao = :descricao, diaria = :diaria, ativo = :ativo WHERE id = :id';
             $stmt = $pdo->prepare($sql);
