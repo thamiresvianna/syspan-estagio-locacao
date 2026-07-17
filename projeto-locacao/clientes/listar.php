@@ -27,7 +27,7 @@
 <?php if(!empty($clientes)): ?>
     <table border="1" cellpadding="5" cellspacing="0">
         <tr>
-            <th>Id</th>
+            <th>ID</th>
             <th>Nome</th>
             <th>E-mail</th>
             <th>Telefone</th>

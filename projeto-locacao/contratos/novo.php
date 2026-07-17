@@ -79,8 +79,11 @@
 <form method="POST">
     <label>Cliente:</label><br>
     <select name="id_cliente" required>
+        <option value="" disabled <?= empty($id_cliente) ? 'selected' : '' ?>>- Selecione um cliente -</option>
         <?php foreach ($clientes as $cliente): ?>
-            <option value="<?= htmlspecialchars($cliente['id']) ?>"><?= htmlspecialchars($cliente['nome']) ?></option>
+            <option value="<?= htmlspecialchars($cliente['id']) ?>" <?= $id_cliente == $cliente['id'] ? 'selected' : '' ?>>
+                <?= htmlspecialchars($cliente['nome']) ?>
+            </option>
         <?php endforeach; ?>
     </select><br>
 
@@ -94,6 +97,7 @@
     <textarea name="observacao"><?= htmlspecialchars($observacao ?? '') ?></textarea><br>
 
     <button type="submit">Salvar</button>
+    <a class="botao-cancelar" href="listar.php">Cancelar</a>
 </form>
 
 <?php

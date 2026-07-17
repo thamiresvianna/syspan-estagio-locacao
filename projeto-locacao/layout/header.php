@@ -168,6 +168,41 @@
                 background-color: #3ca8f0;
             }
 
+            .caixa-index {
+                display: flex;
+                gap: 20px;
+                flex-wrap: wrap;
+                margin-top: 15px;
+            }
+
+            .card-index {
+                padding: 20px;
+                border-radius: 10px;
+                background-color: #5eafe5;
+                color: white;
+                text-decoration: none;
+                flex: 1;
+                min-width: 250px;
+                max-width: 400px;
+                transition: transform .2s, box-shadow .2s;
+                cursor: pointer;
+            }
+
+            .card-index:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 5px 15px rgba(0,0,0,.2);
+                background-color: #4b9fd8;
+            }
+
+            .card-index h4 {
+                margin: 0;
+                font-size: 18px;
+            }
+
+            .card-index p {
+                line-height: 1.5;
+            }
+
             footer {
                 text-align: center;
                 font-size: 14px;
@@ -181,9 +216,10 @@
         <h1>Mini Locação Syspan</h1>
 
         <nav>
-            <a href="/syspan-estagio/projeto-locacao/clientes/listar.php">Clientes</a>
-            <a href="/syspan-estagio/projeto-locacao/equipamentos/listar.php">Equipamentos</a>
-            <a href="/syspan-estagio/projeto-locacao/contratos/listar.php">Contratos</a>
+            <a href="/syspan-estagio-locacao/projeto-locacao/index.php">Home</a>
+            <a href="/syspan-estagio-locacao/projeto-locacao/clientes/listar.php">Clientes</a>
+            <a href="/syspan-estagio-locacao/projeto-locacao/equipamentos/listar.php">Equipamentos</a>
+            <a href="/syspan-estagio-locacao/projeto-locacao/contratos/listar.php">Contratos</a>
         </nav>
 
         <hr>

@@ -55,6 +55,7 @@
     <input type="text" name="telefone" value="<?= htmlspecialchars($telefone ?? '') ?>" required><br><br>
 
     <button type="submit">Salvar</button>
+    <a class="botao-cancelar" href="listar.php">Cancelar</a>
 </form>
 
 <?php

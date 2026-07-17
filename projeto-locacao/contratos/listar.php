@@ -62,7 +62,7 @@
 <?php if(!empty($contratos)): ?>
     <table border="1" cellpadding="5" cellspacing="0">
         <tr>
-            <th>Id</th>
+            <th>ID</th>
             <th>Cliente</th>
             <th>Data de Início</th>
             <th>Data de Fim</th>

@@ -24,7 +24,8 @@
 
     $erros = [];
 
-    $qtd = '';
+    $id_equipamento = '';
+    $qtd = 1;
 
     if($_SERVER["REQUEST_METHOD"] == "POST"){
         $id_equipamento = (int) trim($_POST["id_equipamento"] ?? '');
@@ -75,13 +76,16 @@
 <form method="POST">
     <label>Equipamento:</label><br>
     <select name="id_equipamento" required>
+        <option value="" disabled <?= empty($id_equipamento) ? 'selected' : '' ?>>- Selecione um equipamento -</option>
         <?php foreach ($equipamentos as $equipamento): ?>
-            <option value="<?= htmlspecialchars($equipamento['id']) ?>"><?= htmlspecialchars($equipamento['descricao']) ?> (R$ <?= number_format($equipamento["diaria"], 2, ',', '.') ?>)</option>
+            <option value="<?= htmlspecialchars($equipamento['id']) ?>" <?= $id_equipamento == $equipamento['id'] ? 'selected' : '' ?>>
+                <?= htmlspecialchars($equipamento['descricao']) ?> (R$ <?= number_format($equipamento["diaria"], 2, ',', '.') ?>)
+            </option>
         <?php endforeach; ?>
     </select><br>
 
     <label>Quantidade:</label><br>
-    <input type="number" name="qtd" value="<?= htmlspecialchars($qtd ?? '') ?>" required><br>
+    <input type="number" name="qtd" min="1" value="<?= htmlspecialchars($qtd ?? '') ?>" required><br>
 
     <button type="submit">Salvar</button>
     <a class="botao-cancelar" href="ver.php?id=<?= $id_contrato ?>">Cancelar</a>

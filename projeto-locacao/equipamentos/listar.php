@@ -27,7 +27,7 @@
 <?php if(!empty($equipamentos)): ?>
     <table border="1" cellpadding="5" cellspacing="0">
         <tr>
-            <th>Id</th>
+            <th>ID</th>
             <th>Descrição</th>
             <th>Diária</th>
             <th>Ativo</th>

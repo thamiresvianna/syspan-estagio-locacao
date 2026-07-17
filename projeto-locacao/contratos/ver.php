@@ -51,7 +51,7 @@
 <?php if(!empty($contratoItens)): ?>
     <table border="1" cellpadding="5" cellspacing="0">
         <tr>
-            <th>Id do Item</th>
+            <th>ID do Item</th>
             <th>Equipamento</th>
             <th>Valor Diária Unitária</th>
             <th>Quantidade</th>
