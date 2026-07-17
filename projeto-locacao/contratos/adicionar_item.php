@@ -1,12 +1,9 @@
 <?php
     require_once '../conexao.php';
     require_once '../logger.php';
+    require_once '../helpers.php';
 
-    $id_contrato = (int) ($_GET['id'] ?? 0);
-
-    if($id_contrato <= 0){
-        die("ID do contrato inválido.");
-    }
+    $id_contrato = obterId();
 
     $sql = 'SELECT id FROM contratos WHERE id = :id';
     $consulta = $pdo->prepare($sql);
@@ -78,14 +75,14 @@
     <select name="id_equipamento" required>
         <option value="" disabled <?= empty($id_equipamento) ? 'selected' : '' ?>>- Selecione um equipamento -</option>
         <?php foreach ($equipamentos as $equipamento): ?>
-            <option value="<?= htmlspecialchars($equipamento['id']) ?>" <?= $id_equipamento == $equipamento['id'] ? 'selected' : '' ?>>
-                <?= htmlspecialchars($equipamento['descricao']) ?> (R$ <?= number_format($equipamento["diaria"], 2, ',', '.') ?>)
+            <option value="<?= e($equipamento['id']) ?>" <?= $id_equipamento == $equipamento['id'] ? 'selected' : '' ?>>
+                <?= e($equipamento['descricao']) ?> (R$ <?= number_format($equipamento["diaria"], 2, ',', '.') ?>)
             </option>
         <?php endforeach; ?>
     </select><br>
 
     <label>Quantidade:</label><br>
-    <input type="number" name="qtd" min="1" value="<?= htmlspecialchars($qtd ?? '') ?>" required><br>
+    <input type="number" name="qtd" min="1" value="<?= e($qtd ?? '') ?>" required><br>
 
     <button type="submit">Salvar</button>
     <a class="botao-cancelar" href="ver.php?id=<?= $id_contrato ?>">Cancelar</a>
@@ -93,9 +90,7 @@
 
 <?php
     if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erros)) {
-        foreach ($erros as $erro){
-            echo "<p class='erro'>$erro</p>";
-        }
+        mostrarErros($erros);
     }
 ?>
 

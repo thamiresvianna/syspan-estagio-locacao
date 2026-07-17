@@ -1,6 +1,7 @@
 <?php
     require_once '../conexao.php';
     require_once '../logger.php';
+    require_once '../helpers.php';
 
     $erros = [];
     
@@ -46,13 +47,13 @@
 
 <form method="POST">
     <label>Nome:</label><br>
-    <input type="text" name="nome" value="<?= htmlspecialchars($nome ?? '') ?>" required><br>
+    <input type="text" name="nome" value="<?= e($nome ?? '') ?>" required><br>
 
     <label>E-mail:</label><br>
-    <input type="email" name="email" value="<?= htmlspecialchars($email ?? '') ?>" required><br>
+    <input type="email" name="email" value="<?= e($email ?? '') ?>" required><br>
 
     <label>Telefone:</label><br>
-    <input type="text" name="telefone" value="<?= htmlspecialchars($telefone ?? '') ?>" required><br><br>
+    <input type="text" name="telefone" value="<?= e($telefone ?? '') ?>" required><br><br>
 
     <button type="submit">Salvar</button>
     <a class="botao-cancelar" href="listar.php">Cancelar</a>
@@ -60,9 +61,7 @@
 
 <?php
     if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erros)) {
-        foreach ($erros as $erro){
-            echo "<p class='erro'>$erro</p>";
-        }
+        mostrarErros($erros);
     }
 ?>
 

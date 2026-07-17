@@ -1,13 +1,10 @@
 <?php
     require_once '../conexao.php';
     require_once '../logger.php';
+    require_once '../helpers.php';
 
     $erros = [];
-    $id = (int) ($_GET['id'] ?? 0);
-
-    if($id <= 0){
-        die("ID inválido.");
-    }
+    $id = obterId();
 
     $sql = 'SELECT id, descricao, diaria, ativo, created_at FROM equipamentos WHERE id = :id';
     $consulta = $pdo->prepare($sql);
@@ -59,10 +56,10 @@
 
 <form method="POST">
     <label>Descrição:</label><br>
-    <input type="text" name="descricao" value="<?= htmlspecialchars($descricao ?? '') ?>" required><br>
+    <input type="text" name="descricao" value="<?= e($descricao ?? '') ?>" required><br>
 
     <label>Diária (R$):</label><br>
-    <input type="number" step="0.01" name="diaria" value="<?= htmlspecialchars($diaria ?? '') ?>" required><br>
+    <input type="number" step="0.01" name="diaria" value="<?= e($diaria ?? '') ?>" required><br>
 
     <label>Ativo:</label>
     <input type="checkbox" name="ativo" value="1" <?= $ativo ? 'checked' : '' ?>><br><br>
@@ -73,9 +70,7 @@
 
 <?php
     if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erros)) {
-        foreach ($erros as $erro){
-            echo "<p class='erro'>$erro</p>";
-        }
+        mostrarErros($erros);
     }
 ?>
 

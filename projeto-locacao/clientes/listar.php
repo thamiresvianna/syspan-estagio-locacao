@@ -1,5 +1,6 @@
 <?php
     require_once '../conexao.php';
+    require_once '../helpers.php';
 
     $pagina = max(1, (int)($_GET['pagina'] ?? 1));
     $registros_pagina  = 5;
@@ -38,9 +39,9 @@
         <?php foreach($clientes as $row): ?>
             <tr>
                 <td><?= (int)$row["id"] ?></td>
-                <td><?= htmlspecialchars($row["nome"]) ?></td>
-                <td><?= htmlspecialchars($row["email"]) ?></td>
-                <td><?= htmlspecialchars($row["telefone"]) ?></td>
+                <td><?= e($row["nome"]) ?></td>
+                <td><?= e($row["email"]) ?></td>
+                <td><?= e($row["telefone"]) ?></td>
                 <td><?= date('d/m/Y H:i', strtotime($row["created_at"])) ?></td>
                 <td>
                     <a class="botao-editar" href="editar.php?id=<?= (int)$row["id"] ?>">Editar</a>

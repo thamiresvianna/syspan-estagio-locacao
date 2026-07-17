@@ -1,12 +1,9 @@
 <?php
     require_once '../conexao.php';
     require_once '../logger.php';
+    require_once '../helpers.php';
 
-    $id = (int) ($_GET['id'] ?? 0);
-
-    if($id <= 0){
-        die("ID inválido.");
-    }
+    $id = obterId();
 
     $sql = 'SELECT id, descricao, diaria, ativo, created_at FROM equipamentos WHERE id = :id';
     $consulta = $pdo->prepare($sql);
@@ -51,15 +48,17 @@
 
 <h2>Excluir Equipamento</h2>
 
-<p>Tem certeza que deseja excluir o equipamento: <strong><?= htmlspecialchars($equipamento["descricao"]) ?></strong>?</p>
+<p>Tem certeza que deseja excluir o equipamento: <strong><?= e($equipamento["descricao"]) ?></strong>?</p>
 
 <form method="POST">
     <button type="submit">Excluir</button>
     <a class="botao-cancelar" href="listar.php">Cancelar</a>
 </form>
 
-<?php if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erro)): ?>
-    <p class="erro"><?= htmlspecialchars($erro) ?></p>
-<?php endif; ?>
+<?php 
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erro)){
+        mostrarErros([$erro]);
+    }
+?>
 
 <?php require_once '../layout/footer.php'; ?>

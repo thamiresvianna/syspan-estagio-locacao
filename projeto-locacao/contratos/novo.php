@@ -1,6 +1,7 @@
 <?php
     require_once '../conexao.php';
     require_once '../logger.php';
+    require_once '../helpers.php';
 
     $sql = 'SELECT id, nome FROM clientes';
     $consulta = $pdo->prepare($sql);
@@ -41,15 +42,7 @@
         }
 
         if(empty($erros)){
-            $data_hoje = date('Y-m-d');
-
-            if ($data_hoje < $data_inicio) {
-                $status = "AGENDADO";
-            } elseif ($data_hoje >= $data_inicio && $data_hoje <= $data_fim) {
-                $status = "ATIVO";
-            } else {
-                $status = "ENCERRADO";
-            }
+            $status = calcularStatusContrato($data_inicio, $data_fim);
 
             $sql = 'INSERT INTO contratos (id_cliente, data_inicio, data_fim, status, observacao) 
                     VALUES (:id_cliente, :data_inicio, :data_fim, :status, :observacao)';
@@ -81,20 +74,20 @@
     <select name="id_cliente" required>
         <option value="" disabled <?= empty($id_cliente) ? 'selected' : '' ?>>- Selecione um cliente -</option>
         <?php foreach ($clientes as $cliente): ?>
-            <option value="<?= htmlspecialchars($cliente['id']) ?>" <?= $id_cliente == $cliente['id'] ? 'selected' : '' ?>>
-                <?= htmlspecialchars($cliente['nome']) ?>
+            <option value="<?= e($cliente['id']) ?>" <?= $id_cliente == $cliente['id'] ? 'selected' : '' ?>>
+                <?= e($cliente['nome']) ?>
             </option>
         <?php endforeach; ?>
     </select><br>
 
     <label>Data de Início:</label><br>
-    <input type="date" name="data_inicio" value="<?= htmlspecialchars($data_inicio ?? '') ?>" required><br>
+    <input type="date" name="data_inicio" value="<?= e($data_inicio ?? '') ?>" required><br>
 
     <label>Data de Fim:</label><br>
-    <input type="date" name="data_fim" value="<?= htmlspecialchars($data_fim ?? '') ?>" required><br>
+    <input type="date" name="data_fim" value="<?= e($data_fim ?? '') ?>" required><br>
 
     <label>Observação:</label><br>
-    <textarea name="observacao"><?= htmlspecialchars($observacao ?? '') ?></textarea><br>
+    <textarea name="observacao"><?= e($observacao ?? '') ?></textarea><br>
 
     <button type="submit">Salvar</button>
     <a class="botao-cancelar" href="listar.php">Cancelar</a>
@@ -102,9 +95,7 @@
 
 <?php
     if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erros)) {
-        foreach ($erros as $erro){
-            echo "<p class='erro'>$erro</p>";
-        }
+        mostrarErros($erros);
     }
 ?>
 

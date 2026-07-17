@@ -1,11 +1,8 @@
 <?php
     require_once '../conexao.php';
+    require_once '../helpers.php';
 
-    $id = (int) ($_GET['id'] ?? 0);
-
-    if($id <= 0){
-        die("ID inválido.");
-    }
+    $id = obterId();
 
     $sql = 'SELECT contratos.id, clientes.nome AS cliente, contratos.data_inicio, contratos.data_fim, contratos.status, contratos.observacao, contratos.created_at 
             FROM contratos INNER JOIN clientes ON contratos.id_cliente = clientes.id
@@ -19,9 +16,9 @@
         die("Contrato não encontrado.");
     }
 
-    $data_inicio = new DateTime($contrato['data_inicio']);
-    $data_fim = new DateTime($contrato['data_fim']);
-    $total_dias = $data_inicio->diff($data_fim)->days + 1;
+    $status_atual = calcularStatusContrato($contrato['data_inicio'], $contrato['data_fim']);
+
+    $total_dias = calcularTotalDias($contrato['data_inicio'], $contrato['data_fim']);
 
     $sqlItens = 'SELECT contrato_itens.id, contrato_itens.id_contrato, equipamentos.descricao AS equipamento, contrato_itens.diaria, contrato_itens.qtd
                 FROM contrato_itens INNER JOIN equipamentos ON contrato_itens.id_equipamento = equipamentos.id
@@ -36,11 +33,11 @@
 <h2>Detalhes do Contrato <?= $contrato['id'] ?></h2>
 
 <div>
-    <p><strong>Cliente:</strong> <?= htmlspecialchars($contrato["cliente"]) ?></p>
+    <p><strong>Cliente:</strong> <?= e($contrato["cliente"]) ?></p>
     <p><strong>Período:</strong> <?= date('d/m/Y', strtotime($contrato["data_inicio"])) ?> até <?= date('d/m/Y', strtotime($contrato["data_fim"])) ?> </p>
     <p><strong>Duração:</strong> <?= $total_dias ?> dias</p>
-    <p><strong>Status:</strong> <?= htmlspecialchars($contrato["status"]) ?></p>
-    <p><strong>Observação:</strong> <?= !empty($contrato["observacao"]) ? htmlspecialchars($contrato["observacao"]) : '-' ?></p>    
+    <p><strong>Status:</strong> <?= e($status_atual) ?></p>
+    <p><strong>Observação:</strong> <?= !empty($contrato["observacao"]) ? e($contrato["observacao"]) : '-' ?></p>    
 </div>
 
 <br><a class="links" href="listar.php">Voltar para listagem</a>
@@ -68,7 +65,7 @@
         ?>
             <tr>
                 <td><?= (int)$row["id"] ?></td>
-                <td><?= htmlspecialchars($row["equipamento"]) ?></td>
+                <td><?= e($row["equipamento"]) ?></td>
                 <td>R$ <?= number_format($row["diaria"], 2, ',', '.') ?></td>
                 <td><?= (int)$row["qtd"] ?></td>
                 <td>R$ <?= number_format($subtotal, 2, ',', '.') ?></td>

@@ -1,5 +1,6 @@
 <?php
     require_once '../conexao.php';
+    require_once '../helpers.php';
 
     $pagina = max(1, (int)($_GET['pagina'] ?? 1));
     $registros_pagina  = 5;
@@ -38,7 +39,7 @@
         <?php foreach($equipamentos as $row): ?>
             <tr>
                 <td><?= (int)$row["id"] ?></td>
-                <td><?= htmlspecialchars($row["descricao"]) ?></td>
+                <td><?= e($row["descricao"]) ?></td>
                 <td>R$ <?= number_format($row["diaria"], 2, ',', '.') ?></td>
                 <td><?= $row["ativo"] ? 'Sim' : 'Não' ?></td>
                 <td><?= date('d/m/Y H:i', strtotime($row["created_at"])) ?></td>

@@ -1,5 +1,6 @@
 <?php
     require_once '../conexao.php';
+    require_once '../helpers.php';
 
     $status = trim($_GET['status'] ?? '');
 
@@ -73,13 +74,14 @@
         </tr>
 
         <?php foreach($contratos as $row): ?>
+            <?php $status_atual = calcularStatusContrato($row['data_inicio'], $row['data_fim']); ?>
             <tr>
                 <td><?= (int)$row["id"] ?></td>
-                <td><?= htmlspecialchars($row["cliente"]) ?></td>
+                <td><?= e($row["cliente"]) ?></td>
                 <td><?= date('d/m/Y', strtotime($row["data_inicio"])) ?></td>
                 <td><?= date('d/m/Y', strtotime($row["data_fim"])) ?></td>
-                <td><?= htmlspecialchars($row["status"]) ?></td>
-                <td><?= !empty($row["observacao"]) ? htmlspecialchars($row["observacao"]) : '-' ?></td>
+                <td><?= e($status_atual) ?></td>
+                <td><?= !empty($row["observacao"]) ? e($row["observacao"]) : '-' ?></td>
                 <td><?= date('d/m/Y H:i', strtotime($row["created_at"])) ?></td>
                 <td>
                     <a class="botao-ver" href="ver.php?id=<?= (int)$row["id"] ?>">Ver Itens</a>
