@@ -36,7 +36,7 @@
     <p><strong>Cliente:</strong> <?= e($contrato["cliente"]) ?></p>
     <p><strong>Período:</strong> <?= date('d/m/Y', strtotime($contrato["data_inicio"])) ?> até <?= date('d/m/Y', strtotime($contrato["data_fim"])) ?> </p>
     <p><strong>Duração:</strong> <?= $total_dias ?> dias</p>
-    <p><strong>Status:</strong> <?= e($status_atual) ?></p>
+    <p><strong>Status:</strong> <span class="status <?= strtolower($status_atual) ?>"><?= e($status_atual) ?></span></p>
     <p><strong>Observação:</strong> <?= !empty($contrato["observacao"]) ? e($contrato["observacao"]) : '-' ?></p>    
 </div>
 
@@ -46,7 +46,7 @@
 <h3>Itens do Contrato</h3>
 
 <?php if(!empty($contratoItens)): ?>
-    <table border="1" cellpadding="5" cellspacing="0">
+    <table>
         <tr>
             <th>ID do Item</th>
             <th>Equipamento</th>

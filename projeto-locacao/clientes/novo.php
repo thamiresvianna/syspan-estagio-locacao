@@ -17,19 +17,34 @@
         $erros = validarCliente($nome, $email, $telefone);
         
         if(empty($erros)){
-            $sql = 'INSERT INTO clientes (nome, email, telefone) VALUES (:nome, :email, :telefone)';
-            $stmt = $pdo->prepare($sql);
+            $sql = 'SELECT id FROM clientes WHERE email = :email';
+            $consulta = $pdo->prepare($sql);
+            $consulta->execute([":email" => $email]);
 
-            $stmt->execute([
-                ":nome" => $nome,
-                ":email" => $email,
-                ":telefone" => $telefone
-            ]);
+            if($consulta->fetchColumn()){
+                $erros[] = "Já existe um cliente com esse e-mail.";
+            }
+        }
 
-            registrarLog("Cliente cadastrado: $nome");
+        if(empty($erros)){
+            try{
+                $sql = 'INSERT INTO clientes (nome, email, telefone) VALUES (:nome, :email, :telefone)';
+                $stmt = $pdo->prepare($sql);
 
-            header("Location: listar.php");
-            exit;
+                $stmt->execute([
+                    ":nome" => $nome,
+                    ":email" => $email,
+                    ":telefone" => $telefone
+                ]);
+
+                registrarLog("Cliente cadastrado: $nome");
+
+                header("Location: listar.php");
+                exit;
+            } 
+            catch(PDOException $e){
+                $erros[] = "Erro ao salvar cliente.";
+            }
         }
     }
 

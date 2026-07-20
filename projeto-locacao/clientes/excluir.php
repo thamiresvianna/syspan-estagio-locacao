@@ -3,7 +3,7 @@
     require_once '../logger.php';
     require_once '../helpers.php';
 
-    $id = $id = obterId();
+    $id = obterId();
 
     $sql = 'SELECT id, nome, email, telefone, created_at FROM clientes WHERE id = :id';
     $consulta = $pdo->prepare($sql);
@@ -27,19 +27,24 @@
         if($total_contratos > 0){
             $erro = "Não é possível excluir este cliente porque ele possui contratos vinculados.";
         } else {
-            $sql = 'DELETE FROM clientes WHERE id = :id';
-            $stmt = $pdo->prepare($sql);
+            try{
+                $sql = 'DELETE FROM clientes WHERE id = :id';
+                $stmt = $pdo->prepare($sql);
 
-            $stmt->execute([":id" => $id]);
+                $stmt->execute([":id" => $id]);
 
-            if($stmt->rowCount() === 0){
-                die("Erro ao excluir cliente.");
+                if($stmt->rowCount() === 0){
+                    die("Erro ao excluir cliente.");
+                }
+
+                registrarLog("Cliente excluído: ID $id");
+
+                header("Location: listar.php");
+                exit;
             }
-
-            registrarLog("Cliente excluído: ID $id");
-
-            header("Location: listar.php");
-            exit;
+            catch(PDOException $e){
+                $erro = "Erro ao excluir cliente.";
+            }
         }
     }
 

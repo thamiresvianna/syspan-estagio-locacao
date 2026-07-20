@@ -42,25 +42,30 @@
         }
 
         if(empty($erros)){
-            $status = calcularStatusContrato($data_inicio, $data_fim);
+            try{
+                $status = calcularStatusContrato($data_inicio, $data_fim);
 
-            $sql = 'INSERT INTO contratos (id_cliente, data_inicio, data_fim, status, observacao) 
-                    VALUES (:id_cliente, :data_inicio, :data_fim, :status, :observacao)';
-            $stmt = $pdo->prepare($sql);
+                $sql = 'INSERT INTO contratos (id_cliente, data_inicio, data_fim, status, observacao) 
+                        VALUES (:id_cliente, :data_inicio, :data_fim, :status, :observacao)';
+                $stmt = $pdo->prepare($sql);
 
-            $stmt->execute([
-                ":id_cliente" => $id_cliente,
-                ":data_inicio" => $data_inicio,
-                ":data_fim" => $data_fim,
-                ":status" => $status,
-                ":observacao" => $observacao
-            ]);
+                $stmt->execute([
+                    ":id_cliente" => $id_cliente,
+                    ":data_inicio" => $data_inicio,
+                    ":data_fim" => $data_fim,
+                    ":status" => $status,
+                    ":observacao" => $observacao
+                ]);
 
-            $id_contrato = $pdo->lastInsertId();
-            registrarLog("Contrato criado: ID $id_contrato");
+                $id_contrato = $pdo->lastInsertId();
+                registrarLog("Contrato criado: ID $id_contrato");
 
-            header("Location: listar.php");
-            exit;
+                header("Location: listar.php");
+                exit;
+            }
+            catch(PDOException $e){
+                $erros[] = "Erro ao cadastrar contrato.";
+            }
         }
     }
 

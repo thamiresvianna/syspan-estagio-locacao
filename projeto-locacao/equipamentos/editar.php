@@ -28,20 +28,25 @@
         $erros = validarEquipamento($descricao, $diaria);
         
         if(empty($erros)){
-            $sql = 'UPDATE equipamentos SET descricao = :descricao, diaria = :diaria, ativo = :ativo WHERE id = :id';
-            $stmt = $pdo->prepare($sql);
+            try{
+                $sql = 'UPDATE equipamentos SET descricao = :descricao, diaria = :diaria, ativo = :ativo WHERE id = :id';
+                $stmt = $pdo->prepare($sql);
 
-            $stmt->execute([
-                ":descricao" => $descricao,
-                ":diaria" => $diaria,
-                ":ativo" => $ativo,
-                ":id" => $id
-            ]);
+                $stmt->execute([
+                    ":descricao" => $descricao,
+                    ":diaria" => $diaria,
+                    ":ativo" => $ativo,
+                    ":id" => $id
+                ]);
 
-            registrarLog("Equipamento editado: ID $id");
+                registrarLog("Equipamento editado: ID $id");
 
-            header("Location: listar.php");
-            exit;
+                header("Location: listar.php");
+                exit;
+            }
+            catch(PDOException $e){
+                $erros[] = "Erro ao atualizar equipamento.";
+            }
         }
     }
 

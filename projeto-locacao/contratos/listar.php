@@ -15,7 +15,7 @@
         $sql .= ' WHERE contratos.status = :status';
     }
 
-    $sql .= ' LIMIT :registros_pagina OFFSET :offset';
+    $sql .= ' ORDER BY contratos.id DESC LIMIT :registros_pagina OFFSET :offset';
     $consulta = $pdo->prepare($sql);
 
     if($status !== ''){
@@ -61,7 +61,7 @@
 </form>
 
 <?php if(!empty($contratos)): ?>
-    <table border="1" cellpadding="5" cellspacing="0">
+    <table>
         <tr>
             <th>ID</th>
             <th>Cliente</th>
@@ -80,7 +80,7 @@
                 <td><?= e($row["cliente"]) ?></td>
                 <td><?= date('d/m/Y', strtotime($row["data_inicio"])) ?></td>
                 <td><?= date('d/m/Y', strtotime($row["data_fim"])) ?></td>
-                <td><?= e($status_atual) ?></td>
+                <td><span class="status <?= strtolower($status_atual) ?>"><?= e($status_atual) ?></span></td>
                 <td><?= !empty($row["observacao"]) ? e($row["observacao"]) : '-' ?></td>
                 <td><?= date('d/m/Y H:i', strtotime($row["created_at"])) ?></td>
                 <td>
@@ -92,7 +92,7 @@
 
     <div class="paginacao">
         <?php for($i=1; $i <= $total_paginas; $i++): ?>
-            <a href="?pagina=<?= $i ?>&status=<?=  urlencode($status) ?>" class="<?= $i == $pagina ? 'ativa' : '' ?>"><?= $i ?></a>
+            <a href="?pagina=<?= $i ?>&status=<?= urlencode($status) ?>" class="<?= $i == $pagina ? 'ativa' : '' ?>"><?= $i ?></a>
         <?php endfor; ?>
     </div>
 

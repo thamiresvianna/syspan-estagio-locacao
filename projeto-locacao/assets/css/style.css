@@ -45,6 +45,7 @@ table {
 th, td {
     padding: 8px;
     text-align: left;
+    border: 1px solid #c9c9c9;
 }
 
 th {
@@ -194,6 +195,27 @@ button {
 
 .card-index p {
     line-height: 1.5;
+}
+
+.status {
+    display: inline-block; 
+    padding: 5px 12px; 
+    border-radius: 999px; 
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+}
+
+.status.ativo {
+    background-color: #23a10a;
+}
+
+.status.agendado {
+    background-color: #e3a000;
+}
+
+.status.encerrado {
+    background-color: #777;
 }
 
 footer {

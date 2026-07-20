@@ -49,11 +49,11 @@ CREATE TABLE IF NOT EXISTS contrato_itens (
 );
 
 -- Inserção de Clientes
-INSERT INTO clientes (nome, email, telefone) VALUES ('Marcelo Dias', 'marcelodias@gmail.com', '98610-2385');
-INSERT INTO clientes (nome, email, telefone) VALUES ('Eduardo Moreira', 'eduardomoreira@gmail.com', '98104-1361');
-INSERT INTO clientes (nome, email, telefone) VALUES ('Renata Santos', 'renatasantos@gmail.com', '98686-4038');
-INSERT INTO clientes (nome, email, telefone) VALUES ('Sarah Gonçalves', 'sarahg@gmail.com', '99619-7297');
-INSERT INTO clientes (nome, email, telefone) VALUES ('Luisa Marcon', 'luisa@gmail.com', '98574-0147');
+INSERT INTO clientes (nome, email, telefone) VALUES ('Marcelo Dias', 'marcelodias@gmail.com', '1498610-2385');
+INSERT INTO clientes (nome, email, telefone) VALUES ('Eduardo Moreira', 'eduardomoreira@gmail.com', '1498104-1361');
+INSERT INTO clientes (nome, email, telefone) VALUES ('Renata Santos', 'renatasantos@gmail.com', '1498686-4038');
+INSERT INTO clientes (nome, email, telefone) VALUES ('Sarah Gonçalves', 'sarahg@gmail.com', '1499619-7297');
+INSERT INTO clientes (nome, email, telefone) VALUES ('Luisa Marcon', 'luisa@gmail.com', '1498574-0147');
 
 -- Inserção de Equipamentos
 INSERT INTO equipamentos (descricao, diaria) VALUES ('Gerador de Energia', 230.00);

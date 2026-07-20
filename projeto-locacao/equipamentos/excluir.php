@@ -27,19 +27,24 @@
         if($total_itens > 0){
             $erro = "Não é possível excluir este equipamento porque ele possui contratos vinculados.";
         } else {
-            $sql = 'DELETE FROM equipamentos WHERE id = :id';
-            $stmt = $pdo->prepare($sql);
+            try{
+                $sql = 'DELETE FROM equipamentos WHERE id = :id';
+                $stmt = $pdo->prepare($sql);
 
-            $stmt->execute([":id" => $id]);
+                $stmt->execute([":id" => $id]);
 
-            if($stmt->rowCount() === 0){
-                die("Erro ao excluir equipamento.");
+                if($stmt->rowCount() === 0){
+                    die("Erro ao excluir equipamento.");
+                }
+
+                registrarLog("Equipamento excluído: ID $id");
+
+                header("Location: listar.php");
+                exit;
             }
-
-            registrarLog("Equipamento excluído: ID $id");
-
-            header("Location: listar.php");
-            exit;
+            catch(PDOException $e){
+                $erro = "Erro ao excluir equipamento.";
+            }
         }
     }
 

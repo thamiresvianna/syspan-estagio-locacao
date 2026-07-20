@@ -6,16 +6,23 @@
     $registros_pagina  = 5;
     $offset = ($pagina - 1) * $registros_pagina;
 
-    $sql = 'SELECT id, nome, email, telefone, created_at FROM clientes LIMIT :registros_pagina OFFSET :offset';
+    $busca  = trim($_GET['busca'] ?? '');
+
+    $sql = 'SELECT id, nome, email, telefone, created_at FROM clientes WHERE nome LIKE :busca OR email LIKE :busca
+            ORDER BY nome ASC LIMIT :registros_pagina OFFSET :offset';
     $consulta = $pdo->prepare($sql);
 
+    $consulta->bindValue(':busca', "%$busca%", PDO::PARAM_STR);
     $consulta->bindValue(':registros_pagina', $registros_pagina, PDO::PARAM_INT);
     $consulta->bindValue(':offset', $offset, PDO::PARAM_INT);
 
     $consulta->execute();
     $clientes = $consulta->fetchAll();
 
-    $total_clientes = $pdo->query('SELECT COUNT(*) FROM clientes')->fetchColumn();
+    $sql = 'SELECT COUNT(*) FROM clientes WHERE nome LIKE :busca OR email LIKE :busca';
+    $consulta = $pdo->prepare($sql);
+    $consulta->execute([':busca' => "%$busca%"]);
+    $total_clientes = $consulta->fetchColumn();
     $total_paginas = max(1, ceil($total_clientes / $registros_pagina));
 
     require_once '../layout/header.php';
@@ -25,8 +32,14 @@
 
 <a class="links" href="novo.php">Novo Cliente</a>
 
+<form method="GET">
+    <input type="text" name="busca" placeholder="Pesquisar por nome ou email..." value="<?= e($busca) ?>">
+
+    <button type="submit">Buscar</button>
+</form>
+
 <?php if(!empty($clientes)): ?>
-    <table border="1" cellpadding="5" cellspacing="0">
+    <table>
         <tr>
             <th>ID</th>
             <th>Nome</th>
@@ -53,7 +66,7 @@
 
     <div class="paginacao">
         <?php for($i=1; $i <= $total_paginas; $i++): ?>
-            <a href="?pagina=<?= $i ?>" class="<?= $i == $pagina ? 'ativa' : '' ?>"><?= $i ?></a>
+            <a href="?pagina=<?= $i ?>&busca=<?= e($busca) ?>" class="<?= $i == $pagina ? 'ativa' : '' ?>"><?= $i ?></a>
         <?php endfor; ?>
     </div>
 

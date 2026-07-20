@@ -6,16 +6,23 @@
     $registros_pagina  = 5;
     $offset = ($pagina - 1) * $registros_pagina;
 
-    $sql = 'SELECT id, descricao, diaria, ativo, created_at FROM equipamentos LIMIT :registros_pagina OFFSET :offset';
+    $busca  = trim($_GET['busca'] ?? '');
+
+    $sql = 'SELECT id, descricao, diaria, ativo, created_at FROM equipamentos WHERE descricao LIKE :busca
+            ORDER BY descricao ASC LIMIT :registros_pagina OFFSET :offset';
     $consulta = $pdo->prepare($sql);
 
+    $consulta->bindValue(':busca', "%$busca%", PDO::PARAM_STR);
     $consulta->bindValue(':registros_pagina', $registros_pagina, PDO::PARAM_INT);
     $consulta->bindValue(':offset', $offset, PDO::PARAM_INT);
 
     $consulta->execute();
     $equipamentos = $consulta->fetchAll();
 
-    $total_equipamentos = $pdo->query('SELECT COUNT(*) FROM equipamentos')->fetchColumn();
+    $sql = 'SELECT COUNT(*) FROM equipamentos WHERE descricao LIKE :busca';
+    $consulta = $pdo->prepare($sql);
+    $consulta->execute([':busca' => "%$busca%"]);
+    $total_equipamentos = $consulta->fetchColumn();
     $total_paginas = max(1, ceil($total_equipamentos / $registros_pagina));
 
     require_once '../layout/header.php';
@@ -25,8 +32,14 @@
 
 <a class="links" href="novo.php">Novo Equipamento</a>
 
+<form method="GET">
+    <input type="text" name="busca" placeholder="Pesquisar por descrição..." value="<?= e($busca) ?>">
+
+    <button type="submit">Buscar</button>
+</form>
+
 <?php if(!empty($equipamentos)): ?>
-    <table border="1" cellpadding="5" cellspacing="0">
+    <table>
         <tr>
             <th>ID</th>
             <th>Descrição</th>
@@ -53,7 +66,7 @@
 
     <div class="paginacao">
         <?php for($i=1; $i <= $total_paginas; $i++): ?>
-            <a href="?pagina=<?= $i ?>" class="<?= $i == $pagina ? 'ativa' : '' ?>"><?= $i ?></a>
+            <a href="?pagina=<?= $i ?>&busca=<?= e($busca) ?>" class="<?= $i == $pagina ? 'ativa' : '' ?>"><?= $i ?></a>
         <?php endfor; ?>
     </div>
 

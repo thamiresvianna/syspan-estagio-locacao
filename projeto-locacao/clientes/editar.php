@@ -26,22 +26,37 @@
         $telefone = trim($_POST["telefone"] ?? '');
 
         $erros = validarCliente($nome, $email, $telefone);
+
+        if(empty($erros)){
+            $sql = 'SELECT id FROM clientes WHERE email = :email AND id <> :id';
+            $consulta = $pdo->prepare($sql);
+            $consulta->execute([":email" => $email, ":id" => $id]);
+
+            if($consulta->fetchColumn()){
+                $erros[] = "Já existe um cliente com esse e-mail.";
+            }
+        }
         
         if(empty($erros)){
-            $sql = 'UPDATE clientes SET nome = :nome, email = :email, telefone = :telefone WHERE id = :id';
-            $stmt = $pdo->prepare($sql);
+            try{
+                $sql = 'UPDATE clientes SET nome = :nome, email = :email, telefone = :telefone WHERE id = :id';
+                $stmt = $pdo->prepare($sql);
 
-            $stmt->execute([
-                ":nome" => $nome,
-                ":email" => $email,
-                ":telefone" => $telefone,
-                ":id" => $id
-            ]);
+                $stmt->execute([
+                    ":nome" => $nome,
+                    ":email" => $email,
+                    ":telefone" => $telefone,
+                    ":id" => $id
+                ]);
 
-            registrarLog("Cliente editado: ID $id");
+                registrarLog("Cliente editado: ID $id");
 
-            header("Location: listar.php");
-            exit;
+                header("Location: listar.php");
+                exit;
+            }
+            catch(PDOException $e){
+                $erros[] = "Erro ao atualizar cliente.";
+            }
         }
     }
 

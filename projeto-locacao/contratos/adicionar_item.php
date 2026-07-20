@@ -44,23 +44,28 @@
             if(!$equipamento){
                 die("Equipamento não encontrado.");
             } else {
-                $diaria = $equipamento['diaria'];
+                try{
+                    $diaria = $equipamento['diaria'];
 
-                $sql = 'INSERT INTO contrato_itens (id_contrato, id_equipamento, diaria, qtd) 
-                        VALUES (:id_contrato, :id_equipamento, :diaria, :qtd)';
-                $stmt = $pdo->prepare($sql);
+                    $sql = 'INSERT INTO contrato_itens (id_contrato, id_equipamento, diaria, qtd) 
+                            VALUES (:id_contrato, :id_equipamento, :diaria, :qtd)';
+                    $stmt = $pdo->prepare($sql);
 
-                $stmt->execute([
-                    ":id_contrato" => $id_contrato,
-                    ":id_equipamento" => $id_equipamento,
-                    ":diaria" => $diaria,
-                    ":qtd" => $qtd
-                ]);
+                    $stmt->execute([
+                        ":id_contrato" => $id_contrato,
+                        ":id_equipamento" => $id_equipamento,
+                        ":diaria" => $diaria,
+                        ":qtd" => $qtd
+                    ]);
 
-                registrarLog("Item $id_equipamento adicionado ao contrato: $id_contrato");
+                    registrarLog("Item $id_equipamento adicionado ao contrato: $id_contrato");
 
-                header("Location: ver.php?id=$id_contrato");
-                exit;
+                    header("Location: ver.php?id=$id_contrato");
+                    exit;
+                }
+                catch(PDOException $e){
+                    $erros[] = "Erro ao cadastrar equipamento ao contrato.";
+                }
             }
         }
     }

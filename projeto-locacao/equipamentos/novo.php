@@ -17,19 +17,24 @@
         $erros = validarEquipamento($descricao, $diaria);
 
         if(empty($erros)){
-            $sql = 'INSERT INTO equipamentos (descricao, diaria, ativo) VALUES (:descricao, :diaria, :ativo)';
-            $stmt = $pdo->prepare($sql);
+            try{
+                $sql = 'INSERT INTO equipamentos (descricao, diaria, ativo) VALUES (:descricao, :diaria, :ativo)';
+                $stmt = $pdo->prepare($sql);
 
-            $stmt->execute([
-                ":descricao" => $descricao,
-                ":diaria" => $diaria,
-                ":ativo" => $ativo
-            ]);
+                $stmt->execute([
+                    ":descricao" => $descricao,
+                    ":diaria" => $diaria,
+                    ":ativo" => $ativo
+                ]);
 
-            registrarLog("Equipamento cadastrado: $descricao");
+                registrarLog("Equipamento cadastrado: $descricao");
 
-            header("Location: listar.php");
-            exit;
+                header("Location: listar.php");
+                exit;
+            }
+            catch(PDOException $e){
+                $erros[] = "Erro ao cadastrar equipamento.";
+            }    
         }
     }
 
