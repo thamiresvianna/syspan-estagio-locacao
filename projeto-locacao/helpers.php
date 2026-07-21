@@ -42,21 +42,51 @@
         }
     }
 
-    function validarCliente(string $nome, string $email, string $telefone): array {
+    function validarCliente(string $tipo_pessoa, string $nome, string $cpf_cnpj, string $email, string $telefone, string $cep, string $endereco, 
+                            string $numero, string $complemento, string $bairro, string $cidade, string $estado, string $observacao): array {
         $erros = [];
 
+        $tipo_pessoa = trim($tipo_pessoa);
         $nome = trim($nome);
+        $cpf_cnpj = preg_replace('/\D/', '', trim($cpf_cnpj));
         $email = trim($email);
         $telefone = preg_replace('/\D/', '', trim($telefone));
+        $cep = preg_replace('/\D/', '', trim($cep));
+        $endereco = trim($endereco);
+        $numero = trim($numero);
+        $complemento = trim($complemento);
+        $bairro = trim($bairro);
+        $cidade = trim($cidade);
+        $estado = trim($estado);
+        $observacao = trim($observacao);
 
+        if(!in_array($tipo_pessoa, ['F','J'])){
+            $erros[] = "Tipo de pessoa inválido.";
+        }
         if(strlen($nome) < 3 || strlen($nome) > 120){
             $erros[] = "Nome deve conter entre 3 e 120 caracteres.";
+        }
+        if(empty($cpf_cnpj)){
+            $erros[] = "CPF/CNPJ é obrigatório.";
+        } else {
+            if($tipo_pessoa == 'F' && strlen($cpf_cnpj) != 11){
+                $erros[] = "CPF inválido.";
+            }
+            if($tipo_pessoa == 'J' && strlen($cpf_cnpj) != 14){
+                $erros[] = "CNPJ inválido.";
+            }
         }
         if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
             $erros[] = "E-mail inválido.";
         }
         if(strlen($telefone) < 10 || strlen($telefone) > 11){
             $erros[] = "Telefone inválido.";
+        }
+        if(!empty($cep) && !preg_match('/^\d{8}$/', $cep)){
+            $erros[] = "CEP inválido.";
+        }
+        if(!empty($estado) && !preg_match('/^[A-Z]{2}$/', strtoupper($estado))){
+            $erros[] = "Estado inválido.";
         }
 
         return $erros;

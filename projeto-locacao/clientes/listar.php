@@ -8,7 +8,8 @@
 
     $busca  = trim($_GET['busca'] ?? '');
 
-    $sql = 'SELECT id, nome, email, telefone, created_at FROM clientes WHERE nome LIKE :busca OR email LIKE :busca
+    $sql = 'SELECT id, tipo_pessoa, nome, cpf_cnpj, email, telefone, cep, cidade, estado, created_at FROM clientes 
+            WHERE nome LIKE :busca OR cpf_cnpj LIKE :busca OR email LIKE :busca
             ORDER BY nome ASC LIMIT :registros_pagina OFFSET :offset';
     $consulta = $pdo->prepare($sql);
 
@@ -19,7 +20,7 @@
     $consulta->execute();
     $clientes = $consulta->fetchAll();
 
-    $sql = 'SELECT COUNT(*) FROM clientes WHERE nome LIKE :busca OR email LIKE :busca';
+    $sql = 'SELECT COUNT(*) FROM clientes WHERE nome LIKE :busca OR cpf_cnpj LIKE :busca OR email LIKE :busca';
     $consulta = $pdo->prepare($sql);
     $consulta->execute([':busca' => "%$busca%"]);
     $total_clientes = $consulta->fetchColumn();
@@ -33,7 +34,7 @@
 <a class="links" href="novo.php">Novo Cliente</a>
 
 <form method="GET">
-    <input type="text" name="busca" placeholder="Pesquisar por nome ou email..." value="<?= e($busca) ?>">
+    <input type="text" name="busca" placeholder="Pesquisar por nome, CPF/CNPJ, ou email..." value="<?= e($busca) ?>">
 
     <button type="submit">Buscar</button>
 </form>
@@ -42,9 +43,14 @@
     <table>
         <tr>
             <th>ID</th>
+            <th>Tipo de Pessoa</th>
             <th>Nome</th>
+            <th>CPF/CNPJ</th>
             <th>E-mail</th>
             <th>Telefone</th>
+            <th>CEP</th>
+            <th>Cidade</th>
+            <th>Estado</th>
             <th>Data de Cadastro</th>
             <th>Ações</th>
         </tr>
@@ -52,9 +58,14 @@
         <?php foreach($clientes as $row): ?>
             <tr>
                 <td><?= (int)$row["id"] ?></td>
+                <td><?= $row["tipo_pessoa"] == 'F' ? 'Pessoa Física' : 'Pessoa Jurídica' ?></td>
                 <td><?= e($row["nome"]) ?></td>
+                <td><?= e($row["cpf_cnpj"]) ?></td>
                 <td><?= e($row["email"]) ?></td>
                 <td><?= e($row["telefone"]) ?></td>
+                <td><?= !empty($row["cep"]) ? e($row["cep"]) : '-' ?></td>
+                <td><?= !empty($row["cidade"]) ? e($row["cidade"]) : '-' ?></td>
+                <td><?= !empty($row["estado"]) ? e($row["estado"]) : '-' ?></td>
                 <td><?= date('d/m/Y H:i', strtotime($row["created_at"])) ?></td>
                 <td>
                     <a class="botao-editar" href="editar.php?id=<?= (int)$row["id"] ?>">Editar</a>

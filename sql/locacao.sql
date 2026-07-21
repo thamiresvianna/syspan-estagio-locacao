@@ -84,3 +84,23 @@ FROM contratos INNER JOIN clientes ON contratos.id_cliente = clientes.id;
 -- Select Itens + Equipamento com subtotal
 SELECT contrato_itens.id_contrato, equipamentos.descricao as equipamento, contrato_itens.diaria, contrato_itens.qtd, (contrato_itens.diaria * contrato_itens.qtd) as subtotal
 FROM contrato_itens INNER JOIN equipamentos ON contrato_itens.id_equipamento = equipamentos.id;
+
+-- Adição de Novos Dados de Clientes
+ALTER TABLE clientes 
+ADD tipo_pessoa ENUM('F','J') NOT NULL DEFAULT 'F' AFTER id,
+ADD cpf_cnpj VARCHAR(18) NOT NULL AFTER nome,
+ADD cep VARCHAR(9) NULL AFTER telefone,
+ADD endereco VARCHAR(150) NULL AFTER cep,
+ADD numero VARCHAR(10) NULL AFTER endereco,
+ADD complemento VARCHAR(100) NULL AFTER numero,
+ADD bairro VARCHAR(80) NULL AFTER complemento,
+ADD cidade VARCHAR(80) NULL AFTER bairro,
+ADD estado CHAR(2) NULL AFTER cidade,
+ADD observacao VARCHAR(255) NULL AFTER estado,
+ADD updated_at DATETIME NULL DEFAULT CURRENT_TIMESTAMP
+ON UPDATE CURRENT_TIMESTAMP;
+
+ALTER TABLE clientes ADD UNIQUE (cpf_cnpj);
+
+INSERT INTO clientes (tipo_pessoa, nome, cpf_cnpj, email, telefone, cep, endereco, numero, complemento, bairro, cidade, estado, observacao) 
+VALUES ('J', 'Rent Obras', '63.784.367/0001-63', 'rentobras@gmail.com', '1499153-2789', '17601-290', 'Rua Cezário Nogueira Cabral', '412', 'Empresa', 'Vila Abarca', 'Tupã', 'SP', 'Comunicação somente até 15 horas.');
