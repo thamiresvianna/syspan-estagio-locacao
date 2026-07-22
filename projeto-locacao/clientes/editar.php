@@ -119,7 +119,7 @@
 
             <div class="campo-form">
                 <label>CPF/CNPJ:</label><br>
-                <input type="text" name="cpf_cnpj" value="<?= e($cpf_cnpj ?? '') ?>" required><br>
+                <input type="text" id="cpf_cnpj" maxlength="18" name="cpf_cnpj" value="<?= e($cpf_cnpj ?? '') ?>" placeholder="CPF ou CNPJ" required><br>
             </div>
 
             <div class="campo-form">
@@ -134,7 +134,7 @@
 
             <div class="campo-form">
                 <label>Telefone:</label><br>
-                <input type="text" name="telefone" value="<?= e($telefone ?? '') ?>" required><br>
+                <input type="text" id="telefone" maxlength="15" name="telefone" value="<?= e($telefone ?? '') ?>" placeholder="(14) 99999-9999" required><br>
             </div>
         </div>
     </fieldset>
@@ -144,12 +144,13 @@
         <div class="grid-campos">
             <div class="campo-form">
                 <label>CEP:</label><br>
-                <input type="text" name="cep" value="<?= e($cep ?? '') ?>" required><br>
+                <input type="text" id="cep" maxlength="9" name="cep" value="<?= e($cep ?? '') ?>" placeholder="00000-000" required><br>
+                <span id="mensagem-cep" class="mensagem-cep"></span>
             </div>
             
             <div class="campo-form">
                 <label>Endereço:</label><br>
-                <input type="text" name="endereco" value="<?= e($endereco ?? '') ?>" required><br>
+                <input type="text" id="endereco" name="endereco" value="<?= e($endereco ?? '') ?>" required><br>
             </div>
 
             <div class="campo-form">
@@ -164,17 +165,17 @@
             
             <div class="campo-form">
                 <label>Bairro:</label><br>
-                <input type="text" name="bairro" value="<?= e($bairro ?? '') ?>" required><br>
+                <input type="text" id="bairro" name="bairro" value="<?= e($bairro ?? '') ?>" required><br>
             </div>
             
             <div class="campo-form">
                 <label>Cidade:</label><br>
-                <input type="text" name="cidade" value="<?= e($cidade ?? '') ?>" required><br>
+                <input type="text" id="cidade" name="cidade" value="<?= e($cidade ?? '') ?>" required><br>
             </div>
 
             <div class="campo-form">
                 <label>Estado:</label><br>
-                <input type="text" maxlength="2" name="estado" value="<?= e($estado ?? '') ?>" required><br>
+                <input type="text" id="estado" maxlength="2" name="estado" value="<?= e($estado ?? '') ?>" required><br>
             </div>
         </div>
     </fieldset>
@@ -198,5 +199,117 @@
         mostrarErros($erros);
     }
 ?>
+
+<script>
+    const campo_cep = document.getElementById("cep");
+    const mensagem = document.getElementById("mensagem-cep");
+
+    const endereco = document.getElementById("endereco");
+    const bairro = document.getElementById("bairro");
+    const cidade = document.getElementById("cidade");
+    const estado = document.getElementById("estado");
+    const numero = document.querySelector('[name="numero"]');
+
+    function bloquearEndereco(valor) {
+        endereco.readOnly = valor;
+        bairro.readOnly = valor;
+        cidade.readOnly = valor;
+        estado.readOnly = valor;
+    }
+
+    function limparEndereco() {
+        endereco.value = "";
+        bairro.value = "";
+        cidade.value = "";
+        estado.value = "";
+
+        bloquearEndereco(false);
+    }
+
+    function carregandoEndereco() {
+        campo_cep.readOnly = true;
+
+        endereco.value = "Consultando CEP...";
+        bairro.value = "Consultando...";
+        cidade.value = "Consultando...";
+        estado.value = "...";
+
+        bloquearEndereco(true);
+    }
+
+    campo_cep.addEventListener("input", function () {
+        let cep = this.value.trim().replace(/\D/g, "");
+
+        if(cep.length > 5){
+            cep = cep.slice(0,5) + "-" + cep.slice(5);
+        }
+
+        this.value = cep;
+    });
+
+    let ultimo_cep = "";
+
+    async function buscarCep(cep) {
+        try {
+            const resposta = await fetch(`https://viacep.com.br/ws/${encodeURIComponent(cep)}/json/`);
+
+            if(!resposta.ok){
+                throw new Error("Erro na consulta.");
+            }
+
+            const dados = await resposta.json();
+
+            if (dados.erro){
+                ultimo_cep = "";
+                limparEndereco();
+                    
+                mensagem.textContent = "CEP não encontrado.";
+                campo_cep.focus();
+                return;
+            }
+
+            endereco.value = dados.logradouro;
+            bairro.value = dados.bairro;
+            cidade.value = dados.localidade;
+            estado.value = dados.uf;
+
+            numero.focus();
+        }
+        catch(error) {
+            ultimo_cep = "";
+            limparEndereco();
+
+            mensagem.textContent = "CEP não localizado.";
+            campo_cep.focus();
+        }
+        finally {
+            campo_cep.readOnly = false;
+            bloquearEndereco(false);
+        }
+    }
+
+    campo_cep.addEventListener("blur", async function () {
+        mensagem.textContent = "";
+
+        let cep = this.value.trim().replace(/\D/g, "");
+
+        if(cep.length !== 8){
+            ultimo_cep = "";
+            limparEndereco();
+
+            mensagem.textContent = "CEP deve conter 8 dígitos.";
+            return;
+        }
+
+        if(cep === ultimo_cep){
+            return;
+        }
+
+        ultimo_cep = cep;
+        carregandoEndereco();
+
+        await buscarCep(cep);
+    });
+</script>
 
 <?php require_once '../layout/footer.php'; ?>
