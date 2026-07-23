@@ -68,6 +68,7 @@
                 <td><?= !empty($row["estado"]) ? e($row["estado"]) : '-' ?></td>
                 <td><?= date('d/m/Y H:i', strtotime($row["created_at"])) ?></td>
                 <td>
+                    <a class="botao-ver" href="ver.php?id=<?= (int)$row["id"] ?>">Visualizar</a>
                     <a class="botao-editar" href="editar.php?id=<?= (int)$row["id"] ?>">Editar</a>
                     <a class="botao-excluir" href="excluir.php?id=<?= (int)$row["id"] ?>">Excluir</a>
                 </td>
