@@ -48,6 +48,27 @@ CREATE TABLE IF NOT EXISTS contrato_itens (
  FOREIGN KEY (id_equipamento) REFERENCES equipamentos(id)
 );
 
+-- Preços dos Equipamentos
+CREATE TABLE IF NOT EXISTS precos (
+ id INT AUTO_INCREMENT PRIMARY KEY,
+ nome VARCHAR(100) NOT NULL,
+ descricao VARCHAR(255) NULL,
+ ativo TINYINT(1) NOT NULL DEFAULT 1,
+ created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Preços dos itens dos equipamentos (muitos preços por equipamento)
+CREATE TABLE IF NOT EXISTS preco_itens (
+ id INT AUTO_INCREMENT PRIMARY KEY,
+ id_preco INT NOT NULL,
+ id_equipamento INT NOT NULL,
+ valor_diaria DECIMAL(10,2) NOT NULL,
+ CONSTRAINT fk_preco
+ FOREIGN KEY (id_preco) REFERENCES precos(id),
+ CONSTRAINT fk_preco_equipamento
+ FOREIGN KEY (id_equipamento) REFERENCES equipamentos(id)
+);
+
 -- Inserção de Clientes
 INSERT INTO clientes (nome, email, telefone) VALUES ('Marcelo Dias', 'marcelodias@gmail.com', '1498610-2385');
 INSERT INTO clientes (nome, email, telefone) VALUES ('Eduardo Moreira', 'eduardomoreira@gmail.com', '1498104-1361');
@@ -71,11 +92,6 @@ INSERT INTO contrato_itens (id_contrato, id_equipamento, diaria, qtd) VALUES (1,
 INSERT INTO contrato_itens (id_contrato, id_equipamento, diaria, qtd) VALUES (1, 2, 35.00, 2);
 INSERT INTO contrato_itens (id_contrato, id_equipamento, diaria, qtd) VALUES (2, 3, 550.00, 1);
 INSERT INTO contrato_itens (id_contrato, id_equipamento, diaria, qtd) VALUES (2, 5, 19.00, 3);
-
-select * from clientes;
-select * from equipamentos;
-select * from contratos;
-select * from contrato_itens;
 
 -- Select Contratos + Clientes
 SELECT contratos.id, clientes.nome as cliente, contratos.data_inicio, contratos.data_fim, contratos.status, contratos.observacao
@@ -104,3 +120,13 @@ ALTER TABLE clientes ADD UNIQUE (cpf_cnpj);
 
 INSERT INTO clientes (tipo_pessoa, nome, cpf_cnpj, email, telefone, cep, endereco, numero, complemento, bairro, cidade, estado, observacao) 
 VALUES ('J', 'Rent Obras', '63.784.367/0001-63', 'rentobras@gmail.com', '1499153-2789', '17601-290', 'Rua Cezário Nogueira Cabral', '412', 'Empresa', 'Vila Abarca', 'Tupã', 'SP', 'Comunicação somente até 15 horas.');
+
+-- Migrar valores dos preços dos equipamentos
+INSERT INTO precos (nome, descricao) VALUES ('Tabela Padrão', 'Tabela de preços inicial');
+
+SET @id_tabela = LAST_INSERT_ID();
+INSERT INTO preco_itens (id_preco, id_equipamento, valor_diaria) SELECT @id_tabela, id, diaria FROM equipamentos;
+ALTER TABLE preco_itens ADD UNIQUE uk_preco_equipamento(id_preco, id_equipamento);
+ALTER TABLE contratos ADD id_preco INT NULL AFTER id_cliente;
+ALTER TABLE contratos ADD CONSTRAINT fk_contrato_preco FOREIGN KEY (id_preco) REFERENCES precos(id);
+ALTER TABLE equipamentos DROP COLUMN diaria;

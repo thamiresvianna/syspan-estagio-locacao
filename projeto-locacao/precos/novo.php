@@ -5,32 +5,35 @@
 
     $erros = [];
 
+    $nome = '';
     $descricao = '';
     $ativo = 0;
 
     if($_SERVER["REQUEST_METHOD"] == "POST"){
+        $nome = trim($_POST["nome"] ?? '');
         $descricao = trim($_POST["descricao"] ?? '');
         $ativo = isset($_POST["ativo"]) ? 1 : 0;
         
-        $erros = validarEquipamento($descricao);
+        $erros = validarPreco($nome, $descricao);
 
         if(empty($erros)){
             try{
-                $sql = 'INSERT INTO equipamentos (descricao, ativo) VALUES (:descricao, :ativo)';
+                $sql = 'INSERT INTO precos (nome, descricao, ativo) VALUES (:nome, :descricao, :ativo)';
                 $stmt = $pdo->prepare($sql);
 
                 $stmt->execute([
+                    ":nome" => $nome,
                     ":descricao" => $descricao,
                     ":ativo" => $ativo
                 ]);
 
-                registrarLog("Equipamento cadastrado: $descricao");
+                registrarLog("Preço cadastrado: $nome");
 
                 header("Location: listar.php");
                 exit;
             }
             catch(PDOException $e){
-                $erros[] = "Erro ao cadastrar equipamento.";
+                $erros[] = "Erro ao cadastrar preço.";
             }    
         }
     }
@@ -38,11 +41,14 @@
     require_once '../layout/header.php';
 ?>
 
-<h2>Inserir Equipamento</h2>
+<h2>Inserir Preço</h2>
 
 <form method="POST">
+    <label>Nome da Tabela:</label><br>
+    <input type="text" name="nome" value="<?= e($nome ?? '') ?>" required><br>
+
     <label>Descrição:</label><br>
-    <input type="text" name="descricao" value="<?= e($descricao ?? '') ?>" required><br>
+    <input type="text" name="descricao" value="<?= e($descricao ?? '') ?>"><br>
 
     <label>Ativo:</label>
     <input type="checkbox" name="ativo" value="1" <?= $ativo ? 'checked' : '' ?>><br><br>

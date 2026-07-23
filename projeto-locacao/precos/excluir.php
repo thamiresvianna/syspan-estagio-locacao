@@ -5,46 +5,45 @@
 
     $id = obterId();
 
-    $sql = 'SELECT id, descricao, ativo, created_at FROM equipamentos WHERE id = :id';
+    $sql = 'SELECT id, nome, descricao, ativo, created_at FROM precos WHERE id = :id';
     $consulta = $pdo->prepare($sql);
     $consulta->execute([':id' => $id]);
 
-    $equipamento = $consulta->fetch();
+    $precos = $consulta->fetch();
 
-    if(!$equipamento){
-        die("Equipamento não encontrado.");
+    if(!$precos){
+        die("Preço não encontrado.");
     }
 
     $erro = '';
 
     if($_SERVER["REQUEST_METHOD"] == "POST"){
-        $sql = 'SELECT (SELECT COUNT(*) FROM contrato_itens WHERE id_equipamento = :id1) +
-                       (SELECT COUNT(*) FROM preco_itens WHERE id_equipamento = :id2)';
+        $sql = 'SELECT COUNT(*) FROM preco_itens WHERE id_preco = :id';
         $consulta = $pdo->prepare($sql);
-        $consulta -> execute([':id1' => $id, ':id2' => $id]);
+        $consulta -> execute([':id' => $id]);
 
         $total_itens = $consulta->fetchColumn();
 
         if($total_itens > 0){
-            $erro = "Não é possível excluir este equipamento porque ele possui contratos ou preços vinculados.";
+            $erro = "Não é possível excluir este preço porque ele possui equipamentos vinculados.";
         } else {
             try{
-                $sql = 'DELETE FROM equipamentos WHERE id = :id';
+                $sql = 'DELETE FROM precos WHERE id = :id';
                 $stmt = $pdo->prepare($sql);
 
                 $stmt->execute([":id" => $id]);
 
                 if($stmt->rowCount() === 0){
-                    die("Erro ao excluir equipamento.");
+                    die("Erro ao excluir preço.");
                 }
 
-                registrarLog("Equipamento excluído: ID $id");
+                registrarLog("Preço excluído: ID $id");
 
                 header("Location: listar.php");
                 exit;
             }
             catch(PDOException $e){
-                $erro = "Erro ao excluir equipamento.";
+                $erro = "Erro ao excluir preço.";
             }
         }
     }
@@ -52,9 +51,9 @@
     require_once '../layout/header.php';
 ?>
 
-<h2>Excluir Equipamento</h2>
+<h2>Excluir Preço</h2>
 
-<p>Tem certeza que deseja excluir o equipamento: <strong><?= e($equipamento["descricao"]) ?></strong>?</p>
+<p>Tem certeza que deseja excluir o preço: <strong><?= e($precos["nome"]) ?></strong>?</p>
 
 <form method="POST">
     <button type="submit">Excluir</button>

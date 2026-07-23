@@ -192,7 +192,7 @@
         return $telefone;
     }
 
-    function validarEquipamento(string $descricao, float $diaria): array {
+    function validarEquipamento(string $descricao): array {
         $erros = [];
 
         $descricao = trim($descricao);
@@ -200,8 +200,21 @@
         if(strlen($descricao) < 3 || strlen($descricao) > 120){
             $erros[] = "Descrição deve conter entre 3 e 120 caracteres.";
         }
-        if ($diaria <= 0){
-            $erros[] = "Valor da diária inválido. O valor deve ser maior do que 0.";
+
+        return $erros;
+    }
+
+    function validarPreco(string $nome, string $descricao): array {
+        $erros = [];
+
+        $nome = trim($nome);
+        $descricao = trim($descricao);
+
+        if(strlen($nome) < 3 || strlen($nome) > 120){
+            $erros[] = "Nome deve conter entre 3 e 120 caracteres.";
+        }
+        if(!empty($descricao) && (strlen($descricao) < 3 || strlen($descricao) > 255)){
+            $erros[] = "Descrição deve conter entre 3 e 255 caracteres.";
         }
 
         return $erros;

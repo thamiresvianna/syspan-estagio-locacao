@@ -6,7 +6,7 @@
     $erros = [];
     $id = obterId();
 
-    $sql = 'SELECT id, descricao, diaria, ativo, created_at FROM equipamentos WHERE id = :id';
+    $sql = 'SELECT id, descricao, ativo, created_at FROM equipamentos WHERE id = :id';
     $consulta = $pdo->prepare($sql);
     $consulta->execute([':id' => $id]);
 
@@ -17,24 +17,21 @@
     }
 
     $descricao = $equipamento['descricao'];
-    $diaria = $equipamento['diaria'];
     $ativo = $equipamento['ativo'];
 
     if($_SERVER["REQUEST_METHOD"] == "POST"){
         $descricao = trim($_POST["descricao"] ?? '');
-        $diaria = (float) (trim($_POST["diaria"] ?? ''));
         $ativo = isset($_POST["ativo"]) ? 1 : 0;
 
-        $erros = validarEquipamento($descricao, $diaria);
+        $erros = validarEquipamento($descricao);
         
         if(empty($erros)){
             try{
-                $sql = 'UPDATE equipamentos SET descricao = :descricao, diaria = :diaria, ativo = :ativo WHERE id = :id';
+                $sql = 'UPDATE equipamentos SET descricao = :descricao, ativo = :ativo WHERE id = :id';
                 $stmt = $pdo->prepare($sql);
 
                 $stmt->execute([
                     ":descricao" => $descricao,
-                    ":diaria" => $diaria,
                     ":ativo" => $ativo,
                     ":id" => $id
                 ]);
@@ -58,9 +55,6 @@
 <form method="POST">
     <label>Descrição:</label><br>
     <input type="text" name="descricao" value="<?= e($descricao ?? '') ?>" required><br>
-
-    <label>Diária (R$):</label><br>
-    <input type="number" step="0.01" name="diaria" value="<?= e($diaria ?? '') ?>" required><br>
 
     <label>Ativo:</label>
     <input type="checkbox" name="ativo" value="1" <?= $ativo ? 'checked' : '' ?>><br><br>

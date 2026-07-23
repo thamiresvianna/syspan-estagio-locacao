@@ -14,6 +14,7 @@
             <a href="/syspan-estagio-locacao/projeto-locacao/index.php">Home</a>
             <a href="/syspan-estagio-locacao/projeto-locacao/clientes/listar.php">Clientes</a>
             <a href="/syspan-estagio-locacao/projeto-locacao/equipamentos/listar.php">Equipamentos</a>
+            <a href="/syspan-estagio-locacao/projeto-locacao/precos/listar.php">Preços</a>
             <a href="/syspan-estagio-locacao/projeto-locacao/contratos/listar.php">Contratos</a>
         </nav>
 
