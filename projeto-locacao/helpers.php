@@ -42,23 +42,21 @@
         }
     }
 
-    function validarCliente(string $tipo_pessoa, string $nome, string $cpf_cnpj, string $email, string $telefone, string $cep, string $endereco, 
-                            string $numero, string $complemento, string $bairro, string $cidade, string $estado, string $observacao): array {
+    function limparNumeros(string $valor): string {
+        return preg_replace('/\D/', '', $valor) ?? '';
+    }
+
+    function validarCliente(string $tipo_pessoa, string $nome, string $cpf_cnpj, string $email, 
+                            string $telefone, string $cep, string $estado): array {                 
         $erros = [];
 
         $tipo_pessoa = trim($tipo_pessoa);
         $nome = trim($nome);
-        $cpf_cnpj = preg_replace('/\D/', '', trim($cpf_cnpj));
+        $cpf_cnpj = limparNumeros($cpf_cnpj);
         $email = trim($email);
-        $telefone = preg_replace('/\D/', '', trim($telefone));
-        $cep = preg_replace('/\D/', '', trim($cep));
-        $endereco = trim($endereco);
-        $numero = trim($numero);
-        $complemento = trim($complemento);
-        $bairro = trim($bairro);
-        $cidade = trim($cidade);
+        $telefone = limparNumeros($telefone);
+        $cep = limparNumeros($cep);
         $estado = trim($estado);
-        $observacao = trim($observacao);
 
         if(!in_array($tipo_pessoa, ['F','J'])){
             $erros[] = "Tipo de pessoa inválido.";
@@ -69,11 +67,15 @@
         if(empty($cpf_cnpj)){
             $erros[] = "CPF/CNPJ é obrigatório.";
         } else {
-            if($tipo_pessoa == 'F' && strlen($cpf_cnpj) != 11){
-                $erros[] = "CPF inválido.";
+            if($tipo_pessoa == 'F'){
+                if(!validarCPF($cpf_cnpj)){
+                    $erros[] = "CPF inválido.";
+                }
             }
-            if($tipo_pessoa == 'J' && strlen($cpf_cnpj) != 14){
-                $erros[] = "CNPJ inválido.";
+            if($tipo_pessoa == 'J'){
+                if(!validarCNPJ($cpf_cnpj)){
+                    $erros[] = "CNPJ inválido.";
+                }
             }
         }
         if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
@@ -90,6 +92,78 @@
         }
 
         return $erros;
+    }
+
+    function validarCPF(string $cpf): bool {
+        $cpf = limparNumeros($cpf);
+
+        if(strlen($cpf) != 11){
+            return false;
+        }
+        if(preg_match('/^(\d)\1{10}$/', $cpf)){
+            return false;
+        }
+
+        $soma_primeiro_digito = 0;
+        for($i = 0; $i < 9; $i++){
+            $soma_primeiro_digito += $cpf[$i] * (10 - $i);
+        }
+        $resto = ($soma_primeiro_digito * 10) % 11;
+        if($resto == 10){
+            $resto = 0;
+        }
+        if($resto != $cpf[9]){
+            return false;
+        }
+
+        $soma_segundo_digito = 0;
+        for($i = 0; $i < 10; $i++){
+            $soma_segundo_digito += $cpf[$i] * (11 - $i);
+        }
+        $resto = ($soma_segundo_digito * 10) % 11;
+        if($resto == 10){
+            $resto = 0;
+        }
+        if($resto != $cpf[10]){
+            return false;
+        }
+
+        return true;
+    }
+
+    function validarCNPJ(string $cnpj): bool {
+        $cnpj = limparNumeros($cnpj);
+
+        if(strlen($cnpj) != 14){
+            return false;
+        }
+        if(preg_match('/^(\d)\1{13}$/', $cnpj)){
+            return false;
+        }
+
+        $peso1 = [5,4,3,2,9,8,7,6,5,4,3,2];
+        $soma_peso1 = 0;
+        for($i = 0; $i < 12; $i++){
+            $soma_peso1 += $cnpj[$i] * $peso1[$i];
+        }
+        $resto = $soma_peso1 % 11;
+        $digito1 = ($resto < 2) ? 0 : 11 - $resto;
+        if($digito1 != $cnpj[12]){
+            return false;
+        }
+
+        $peso2 = [6,5,4,3,2,9,8,7,6,5,4,3,2];
+        $soma_peso2 = 0;
+        for($i = 0; $i < 13; $i++){
+            $soma_peso2 += $cnpj[$i] * $peso2[$i];
+        }
+        $resto = $soma_peso2 % 11;
+        $digito2 = ($resto < 2) ? 0 : 11 - $resto;
+        if($digito2 != $cnpj[13]){
+            return false;
+        }
+
+        return true;
     }
 
     function validarEquipamento(string $descricao, float $diaria): array {

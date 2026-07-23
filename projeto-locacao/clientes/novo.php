@@ -33,8 +33,8 @@
         $cidade = trim($_POST["cidade"] ?? '');
         $estado = strtoupper(trim($_POST["estado"] ?? ''));
         $observacao = trim($_POST["observacao"] ?? '');
-
-        $erros = validarCliente($tipo_pessoa, $nome, $cpf_cnpj, $email, $telefone, $cep, $endereco, $numero, $complemento, $bairro, $cidade, $estado, $observacao);
+        
+        $erros = validarCliente($tipo_pessoa, $nome, $cpf_cnpj, $email, $telefone, $cep, $estado);
         
         if(empty($erros)){
             $sql = 'SELECT id FROM clientes WHERE email = :email';
@@ -98,15 +98,15 @@
         <div class="grid-campos">
             <div class="campo-form">
                 <label>Tipo Pessoa:</label><br>
-                <select name="tipo_pessoa" required>
+                <select id="tipo_pessoa" name="tipo_pessoa" required>
                     <option value="F" <?= $tipo_pessoa == 'F' ? 'selected' : '' ?>>Pessoa Física</option>
                     <option value="J" <?= $tipo_pessoa == 'J' ? 'selected' : '' ?>>Pessoa Jurídica</option>
                 </select><br>
             </div>
 
             <div class="campo-form">
-                <label>CPF/CNPJ:</label><br>
-                <input type="text" id="cpf_cnpj" maxlength="18" name="cpf_cnpj" value="<?= e($cpf_cnpj ?? '') ?>" placeholder="CPF ou CNPJ" required><br>
+                <label id="label_cpf_cnpj">CPF:</label><br>
+                <input type="text" id="cpf_cnpj" maxlength="14" name="cpf_cnpj" value="<?= e($cpf_cnpj ?? '') ?>" placeholder="000.000.000-00" required><br>
             </div>
 
             <div class="campo-form">
@@ -192,6 +192,9 @@
     const mensagem = document.getElementById("mensagem-cep");
 
     const cpf_cnpj = document.getElementById("cpf_cnpj");
+    const tipo_pessoa = document.getElementById("tipo_pessoa");
+    const label_cpf_cnpj = document.getElementById("label_cpf_cnpj");
+
     const telefone = document.getElementById("telefone");
 
     const endereco = document.getElementById("endereco");
@@ -227,10 +230,27 @@
         bloquearEndereco(true);
     }
 
+    function atualizarTipoPessoa(limpar = false) {
+        if(tipo_pessoa.value === "F"){
+            label_cpf_cnpj.textContent = "CPF:";
+            cpf_cnpj.placeholder = "000.000.000-00";
+            cpf_cnpj.maxLength = 14;
+        }
+        else{
+            label_cpf_cnpj.textContent = "CNPJ:";
+            cpf_cnpj.placeholder = "00.000.000/0000-00";
+            cpf_cnpj.maxLength = 18;
+        }
+
+        if(limpar){
+            cpf_cnpj.value = "";
+        }
+    }
+
     cpf_cnpj.addEventListener("input", function () {
         let valor = this.value.trim().replace(/\D/g, "");
 
-        if(valor.length <= 11){
+        if(tipo_pessoa.value === "F"){
             valor = valor.substring(0,11);
 
             valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
@@ -343,6 +363,10 @@
 
         await buscarCep(cep);
     });
+
+    tipo_pessoa.addEventListener("change", () => atualizarTipoPessoa(true));
+
+    atualizarTipoPessoa();
 </script>
 
 <?php require_once '../layout/footer.php'; ?>
