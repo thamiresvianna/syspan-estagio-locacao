@@ -60,9 +60,9 @@
                 <td><?= (int)$row["id"] ?></td>
                 <td><?= $row["tipo_pessoa"] == 'F' ? 'Pessoa Física' : 'Pessoa Jurídica' ?></td>
                 <td><?= e($row["nome"]) ?></td>
-                <td><?= e($row["cpf_cnpj"]) ?></td>
+                <td><?= e(formatarCpfCnpj($row["cpf_cnpj"])) ?></td>
                 <td><?= e($row["email"]) ?></td>
-                <td><?= e($row["telefone"]) ?></td>
+                <td><?= e(formatarTelefone($row["telefone"])) ?></td>
                 <td><?= !empty($row["cep"]) ? e($row["cep"]) : '-' ?></td>
                 <td><?= !empty($row["cidade"]) ? e($row["cidade"]) : '-' ?></td>
                 <td><?= !empty($row["estado"]) ? e($row["estado"]) : '-' ?></td>

@@ -67,12 +67,12 @@
         if(empty($cpf_cnpj)){
             $erros[] = "CPF/CNPJ é obrigatório.";
         } else {
-            if($tipo_pessoa == 'F'){
+            if($tipo_pessoa === 'F'){
                 if(!validarCPF($cpf_cnpj)){
                     $erros[] = "CPF inválido.";
                 }
             }
-            if($tipo_pessoa == 'J'){
+            if($tipo_pessoa === 'J'){
                 if(!validarCNPJ($cpf_cnpj)){
                     $erros[] = "CNPJ inválido.";
                 }
@@ -164,6 +164,32 @@
         }
 
         return true;
+    }
+
+    function formatarCpfCnpj(string $cpf_cnpj): string {
+        $cpf_cnpj = limparNumeros($cpf_cnpj);
+
+        if(strlen($cpf_cnpj) === 11){
+            return preg_replace('/(\d{3})(\d{3})(\d{3})(\d{2})/', '$1.$2.$3-$4', $cpf_cnpj) ?? $cpf_cnpj;
+        }
+        if(strlen($cpf_cnpj) === 14){
+            return preg_replace('/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/', '$1.$2.$3/$4-$5', $cpf_cnpj) ?? $cpf_cnpj;
+        }
+
+        return $cpf_cnpj;
+    }
+
+    function formatarTelefone(string $telefone): string {
+        $telefone = limparNumeros($telefone);
+
+        if(strlen($telefone) === 10){
+            return preg_replace('/(\d{2})(\d{4})(\d{4})/', '($1) $2-$3', $telefone) ?? $telefone;
+        }
+        if(strlen($telefone) === 11){
+            return preg_replace('/(\d{2})(\d{5})(\d{4})/', '($1) $2-$3', $telefone) ?? $telefone;
+        }
+
+        return $telefone;
     }
 
     function validarEquipamento(string $descricao, float $diaria): array {
