@@ -12,7 +12,7 @@
     $precos = $consulta->fetch();
 
     if(!$precos){
-        die("Preço não encontrado.");
+        die("Tabela de preços não encontrada.");
     }
 
     $erro = '';
@@ -25,7 +25,7 @@
         $total_itens = $consulta->fetchColumn();
 
         if($total_itens > 0){
-            $erro = "Não é possível excluir este preço porque ele possui equipamentos vinculados.";
+            $erro = "Não é possível excluir esta tabela de preços porque ela possui equipamentos vinculados.";
         } else {
             try{
                 $sql = 'DELETE FROM precos WHERE id = :id';
@@ -34,16 +34,16 @@
                 $stmt->execute([":id" => $id]);
 
                 if($stmt->rowCount() === 0){
-                    die("Erro ao excluir preço.");
+                    die("Erro ao excluir tabela de preços.");
                 }
 
-                registrarLog("Preço excluído: ID $id");
+                registrarLog("Tabela de preços excluída: ID $id");
 
                 header("Location: listar.php");
                 exit;
             }
             catch(PDOException $e){
-                $erro = "Erro ao excluir preço.";
+                $erro = "Erro ao excluir tabela de preços.";
             }
         }
     }
@@ -51,9 +51,9 @@
     require_once '../layout/header.php';
 ?>
 
-<h2>Excluir Preço</h2>
+<h2>Excluir Tabela de Preços</h2>
 
-<p>Tem certeza que deseja excluir o preço: <strong><?= e($precos["nome"]) ?></strong>?</p>
+<p>Tem certeza que deseja excluir a tabela de preços: <strong><?= e($precos["nome"]) ?></strong>?</p>
 
 <form method="POST">
     <button type="submit">Excluir</button>

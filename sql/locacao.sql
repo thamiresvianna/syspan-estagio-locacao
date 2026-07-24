@@ -123,10 +123,13 @@ VALUES ('J', 'Rent Obras', '63.784.367/0001-63', 'rentobras@gmail.com', '1499153
 
 -- Migrar valores dos preços dos equipamentos
 INSERT INTO precos (nome, descricao) VALUES ('Tabela Padrão', 'Tabela de preços inicial');
-
 SET @id_tabela = LAST_INSERT_ID();
+
 INSERT INTO preco_itens (id_preco, id_equipamento, valor_diaria) SELECT @id_tabela, id, diaria FROM equipamentos;
 ALTER TABLE preco_itens ADD UNIQUE uk_preco_equipamento(id_preco, id_equipamento);
+
 ALTER TABLE contratos ADD id_preco INT NULL AFTER id_cliente;
+UPDATE contratos SET id_preco = @id_tabela WHERE id_preco IS NULL;
+
 ALTER TABLE contratos ADD CONSTRAINT fk_contrato_preco FOREIGN KEY (id_preco) REFERENCES precos(id);
 ALTER TABLE equipamentos DROP COLUMN diaria;

@@ -27,13 +27,13 @@
                     ":ativo" => $ativo
                 ]);
 
-                registrarLog("Preço cadastrado: $nome");
+                registrarLog("Tabela de preços cadastrada: $nome");
 
                 header("Location: listar.php");
                 exit;
             }
             catch(PDOException $e){
-                $erros[] = "Erro ao cadastrar preço.";
+                $erros[] = "Erro ao cadastrar tabela de preços.";
             }    
         }
     }
@@ -41,7 +41,7 @@
     require_once '../layout/header.php';
 ?>
 
-<h2>Inserir Preço</h2>
+<h2>Inserir Tabela de Preços</h2>
 
 <form method="POST">
     <label>Nome da Tabela:</label><br>

@@ -13,7 +13,7 @@
     $precos = $consulta->fetch();
 
     if(!$precos){
-        die("Preço não encontrado.");
+        die("Tabela de preços não encontrada.");
     }
 
     $nome = $precos['nome'];
@@ -39,13 +39,13 @@
                     ":id" => $id
                 ]);
 
-                registrarLog("Preço editado: ID $id");
+                registrarLog("Tabela de preços editada: ID $id");
 
                 header("Location: listar.php");
                 exit;
             }
             catch(PDOException $e){
-                $erros[] = "Erro ao atualizar preço.";
+                $erros[] = "Erro ao atualizar tabela de preços.";
             }
         }
     }
@@ -53,7 +53,7 @@
     require_once '../layout/header.php';
 ?>
 
-<h2>Editar Preço</h2>
+<h2>Editar Tabela de Preços</h2>
 
 <form method="POST">
     <label>Nome da Tabela:</label><br>
