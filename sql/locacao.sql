@@ -133,3 +133,19 @@ UPDATE contratos SET id_preco = @id_tabela WHERE id_preco IS NULL;
 
 ALTER TABLE contratos ADD CONSTRAINT fk_contrato_preco FOREIGN KEY (id_preco) REFERENCES precos(id);
 ALTER TABLE equipamentos DROP COLUMN diaria;
+
+-- Adição de Novos Dados de Equipamentos
+ALTER TABLE equipamentos 
+ADD codigo VARCHAR(30) NOT NULL AFTER id,
+ADD categoria VARCHAR(80) NULL AFTER descricao,
+ADD marca VARCHAR(80) NULL AFTER categoria,
+ADD modelo VARCHAR(80) NULL AFTER marca,
+ADD numero_serie VARCHAR(80) NULL AFTER modelo,
+ADD observacao VARCHAR(255) NULL AFTER ativo,
+ADD updated_at DATETIME NULL DEFAULT CURRENT_TIMESTAMP
+ON UPDATE CURRENT_TIMESTAMP;
+
+ALTER TABLE equipamentos ADD UNIQUE (codigo);
+
+INSERT INTO equipamentos (codigo, descricao, categoria, marca, modelo, numero_serie, ativo, observacao) 
+VALUES ('EQ0017', 'Gerador 10 kVA', 'Energia', 'Nagano', 'ND8GFLDE', 'NG10KVA-45896321', 1, 'Baixo consumo e alta durabilidade.');

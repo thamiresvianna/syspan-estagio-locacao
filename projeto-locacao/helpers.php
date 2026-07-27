@@ -192,13 +192,37 @@
         return $telefone;
     }
 
-    function validarEquipamento(string $descricao): array {
+    function validarEquipamento(string $codigo, string $descricao, string $categoria, 
+                                string $marca, string $modelo, string $numero_serie): array {
         $erros = [];
 
+        $codigo = trim($codigo);
         $descricao = trim($descricao);
+        $categoria = trim($categoria);
+        $marca = trim($marca);
+        $modelo = trim($modelo);
+        $numero_serie = trim($numero_serie);
 
+        if(empty($codigo)){
+            $erros[] = "Código é obrigatório.";
+        }
+        if(strlen($codigo) < 2 || strlen($codigo) > 30){
+            $erros[] = "Código deve conter entre 2 e 30 caracteres.";
+        }
         if(strlen($descricao) < 3 || strlen($descricao) > 120){
             $erros[] = "Descrição deve conter entre 3 e 120 caracteres.";
+        }
+        if(!empty($categoria) && (strlen($categoria) < 3 || strlen($categoria) > 80)){
+            $erros[] = "Categoria deve conter entre 3 e 80 caracteres.";
+        }
+        if(!empty($marca) && (strlen($marca) < 3 || strlen($marca) > 80)){
+            $erros[] = "Marca deve conter entre 3 e 80 caracteres.";
+        }
+        if(!empty($modelo) && (strlen($modelo) < 3 || strlen($modelo) > 80)){
+            $erros[] = "Modelo deve conter entre 3 e 80 caracteres.";
+        }
+        if(!empty($numero_serie) && (strlen($numero_serie) < 3 || strlen($numero_serie) > 80)){
+            $erros[] = "Número de série deve conter entre 3 e 80 caracteres.";
         }
 
         return $erros;

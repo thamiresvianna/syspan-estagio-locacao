@@ -8,7 +8,8 @@
 
     $busca  = trim($_GET['busca'] ?? '');
 
-    $sql = 'SELECT id, descricao, ativo, created_at FROM equipamentos WHERE descricao LIKE :busca
+    $sql = 'SELECT id, codigo, descricao, categoria, marca, ativo, created_at FROM equipamentos 
+            WHERE codigo LIKE :busca OR descricao LIKE :busca OR categoria LIKE :busca OR marca LIKE :busca
             ORDER BY descricao ASC LIMIT :registros_pagina OFFSET :offset';
     $consulta = $pdo->prepare($sql);
 
@@ -19,7 +20,7 @@
     $consulta->execute();
     $equipamentos = $consulta->fetchAll();
 
-    $sql = 'SELECT COUNT(*) FROM equipamentos WHERE descricao LIKE :busca';
+    $sql = 'SELECT COUNT(*) FROM equipamentos WHERE codigo LIKE :busca OR descricao LIKE :busca OR categoria LIKE :busca OR marca LIKE :busca';
     $consulta = $pdo->prepare($sql);
     $consulta->execute([':busca' => "%$busca%"]);
     $total_equipamentos = $consulta->fetchColumn();
@@ -33,7 +34,7 @@
 <a class="links" href="novo.php">Novo Equipamento</a>
 
 <form method="GET">
-    <input type="text" name="busca" placeholder="Pesquisar por descrição..." value="<?= e($busca) ?>">
+    <input type="text" name="busca" placeholder="Pesquisar por código, descrição, categoria ou marca..." value="<?= e($busca) ?>">
 
     <button type="submit">Buscar</button>
 </form>
@@ -41,8 +42,10 @@
 <?php if(!empty($equipamentos)): ?>
     <table>
         <tr>
-            <th>ID</th>
+            <th>Código</th>
             <th>Descrição</th>
+            <th>Categoria</th>
+            <th>Marca</th>
             <th>Ativo</th>
             <th>Data de Cadastro</th>
             <th>Ações</th>
@@ -50,11 +53,14 @@
 
         <?php foreach($equipamentos as $row): ?>
             <tr>
-                <td><?= (int)$row["id"] ?></td>
+                <td><?= e($row["codigo"]) ?></td>
                 <td><?= e($row["descricao"]) ?></td>
+                <td><?= !empty($row["categoria"]) ? e($row["categoria"]) : '-' ?></td>
+                <td><?= !empty($row["marca"]) ? e($row["marca"]) : '-' ?></td>
                 <td><?= $row["ativo"] ? 'Sim' : 'Não' ?></td>
                 <td><?= date('d/m/Y H:i', strtotime($row["created_at"])) ?></td>
                 <td>
+                    <a class="botao-ver" href="ver.php?id=<?= (int)$row["id"] ?>">Visualizar</a>
                     <a class="botao-editar" href="editar.php?id=<?= (int)$row["id"] ?>">Editar</a>
                     <a class="botao-excluir" href="excluir.php?id=<?= (int)$row["id"] ?>">Excluir</a>
                 </td>

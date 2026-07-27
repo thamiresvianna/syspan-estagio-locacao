@@ -5,7 +5,8 @@
 
     $id = obterId();
 
-    $sql = 'SELECT id, descricao, ativo, created_at FROM equipamentos WHERE id = :id';
+    $sql = 'SELECT id, codigo, descricao, categoria, marca, modelo, numero_serie, ativo, observacao, created_at 
+            FROM equipamentos WHERE id = :id';
     $consulta = $pdo->prepare($sql);
     $consulta->execute([':id' => $id]);
 
