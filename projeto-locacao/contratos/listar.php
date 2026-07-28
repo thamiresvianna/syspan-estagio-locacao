@@ -3,16 +3,28 @@
     require_once '../helpers.php';
 
     $status = trim($_GET['status'] ?? '');
+    $busca  = trim($_GET['busca'] ?? '');
 
     $pagina = max(1, (int)($_GET['pagina'] ?? 1));
     $registros_pagina  = 5;
     $offset = ($pagina - 1) * $registros_pagina;
 
-    $sql = 'SELECT contratos.id, clientes.nome AS cliente, contratos.data_inicio, contratos.data_fim, contratos.status, contratos.observacao, contratos.created_at 
-            FROM contratos INNER JOIN clientes ON contratos.id_cliente = clientes.id';
+    $sql = 'SELECT contratos.id, clientes.nome AS cliente, clientes.cpf_cnpj, precos.nome as tabela_preco, 
+            contratos.data_inicio, contratos.data_fim, contratos.status, contratos.observacao, contratos.created_at 
+            FROM contratos INNER JOIN clientes ON contratos.id_cliente = clientes.id LEFT JOIN precos ON contratos.id_preco = precos.id';
+
+    $where_consulta = [];
 
     if($status !== ''){
-        $sql .= ' WHERE contratos.status = :status';
+        $where_consulta[] = 'contratos.status = :status';
+    }
+
+    if($busca !== ''){
+        $where_consulta[] = '(clientes.nome LIKE :busca OR clientes.cpf_cnpj LIKE :busca OR contratos.id LIKE :busca OR precos.nome LIKE :busca)';
+    }
+
+    if(!empty($where_consulta)){
+        $sql .= ' WHERE ' . implode(' AND ', $where_consulta);
     }
 
     $sql .= ' ORDER BY contratos.id DESC LIMIT :registros_pagina OFFSET :offset';
@@ -20,6 +32,9 @@
 
     if($status !== ''){
         $consulta->bindValue(':status', $status);
+    }
+    if($busca !== ''){
+        $consulta->bindValue(':busca', "%$busca%");
     }
 
     $consulta->bindValue(':registros_pagina', $registros_pagina, PDO::PARAM_INT);
@@ -29,9 +44,22 @@
     $contratos = $consulta->fetchAll();
 
     if($status !== ''){
-        $sqlCount = 'SELECT COUNT(*) FROM contratos WHERE status = :status';
+        $sqlCount = 'SELECT COUNT(*) FROM contratos INNER JOIN clientes ON contratos.id_cliente = clientes.id 
+                    LEFT JOIN precos ON contratos.id_preco = precos.id';
+        
+        if(!empty($where_consulta)){
+            $sql .= ' WHERE ' . implode(' AND ', $where_consulta);
+        }
+
         $consultaCount = $pdo->prepare($sqlCount);
-        $consultaCount->bindValue(':status', $status);
+
+        if($status !== ''){
+            $consulta->bindValue(':status', $status);
+        }
+        if($busca !== ''){
+            $consulta->bindValue(':busca', "%$busca%");
+        }
+
         $consultaCount->execute();
 
         $total_contratos = $consultaCount->fetchColumn();
@@ -47,6 +75,12 @@
 <h2>Lista de Contratos</h2>
 
 <a class="links" href="novo.php">Novo Contrato</a><br><br>
+
+<form method="GET">
+    <input type="text" name="busca" placeholder="Pesquisar por cliente, CPF/CNPJ, contrato ou tabela de preços..." value="<?= e($busca) ?>">
+
+    <button type="submit">Buscar</button>
+</form><br>
 
 <form method="GET">
     <label>Status:</label>
@@ -65,10 +99,11 @@
         <tr>
             <th>ID</th>
             <th>Cliente</th>
+            <th>CPF/CNPJ</th>
             <th>Data de Início</th>
             <th>Data de Fim</th>
+            <th>Tabela</th>
             <th>Status</th>
-            <th>Observações</th>
             <th>Data de Cadastro</th>
             <th>Ações</th>
         </tr>
@@ -78,13 +113,16 @@
             <tr>
                 <td><?= (int)$row["id"] ?></td>
                 <td><?= e($row["cliente"]) ?></td>
+                <td><?= e($row["cpf_cnpj"]) ?></td>
                 <td><?= date('d/m/Y', strtotime($row["data_inicio"])) ?></td>
                 <td><?= date('d/m/Y', strtotime($row["data_fim"])) ?></td>
+                <td><?= e($row["tabela_preco"] ?? '-') ?></td>
                 <td><span class="status <?= strtolower($status_atual) ?>"><?= e($status_atual) ?></span></td>
-                <td><?= !empty($row["observacao"]) ? e($row["observacao"]) : '-' ?></td>
                 <td><?= date('d/m/Y H:i', strtotime($row["created_at"])) ?></td>
                 <td>
                     <a class="botao-ver" href="ver.php?id=<?= (int)$row["id"] ?>">Ver Itens</a>
+                    <a class="botao-editar" href="editar.php?id=<?= (int)$row["id"] ?>">Editar</a>
+                    <a class="botao-excluir" href="excluir.php?id=<?= (int)$row["id"] ?>">Excluir</a>
                 </td>
             </tr>
         <?php endforeach; ?>
@@ -92,7 +130,7 @@
 
     <div class="paginacao">
         <?php for($i=1; $i <= $total_paginas; $i++): ?>
-            <a href="?pagina=<?= $i ?>&status=<?= urlencode($status) ?>" class="<?= $i == $pagina ? 'ativa' : '' ?>"><?= $i ?></a>
+            <a href="?pagina=<?= $i ?>&busca=<?= urldecode($busca) ?>&status=<?= urlencode($status) ?>" class="<?= $i == $pagina ? 'ativa' : '' ?>"><?= $i ?></a>
         <?php endfor; ?>
     </div>
 

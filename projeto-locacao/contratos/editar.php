@@ -3,24 +3,35 @@
     require_once '../logger.php';
     require_once '../helpers.php';
 
+    $erros = [];
+    $id = obterId();
+
+    $sql = 'SELECT id, id_cliente, id_preco, data_inicio, data_fim, status, observacao, created_at FROM contratos WHERE id = :id';
+    $consulta = $pdo->prepare($sql);
+    $consulta -> execute([':id' => $id]);
+
+    $contrato = $consulta->fetch();
+
+    if(!$contrato){
+        die("Contrato não encontrado.");
+    }
+
     $sql = 'SELECT id, nome FROM clientes';
     $consulta = $pdo->prepare($sql);
     $consulta->execute();
 
     $clientes = $consulta->fetchAll();
 
-    $sql = 'SELECT id, nome FROM precos WHERE ativo = 1';
+    $sql = 'SELECT id, nome FROM precos WHERE ativo = 1 OR id = :id_preco';
     $consulta = $pdo->prepare($sql);
-    $consulta->execute();
+    $consulta->execute([':id_preco' => $contrato['id_preco']]);
     $precos = $consulta->fetchAll();
 
-    $erros = [];
-
-    $id_cliente = '';
-    $id_preco = '';
-    $data_inicio = '';
-    $data_fim = '';
-    $observacao = '';
+    $id_cliente = $contrato['id_cliente'];
+    $id_preco = $contrato['id_preco'];
+    $data_inicio = $contrato['data_inicio'];
+    $data_fim = $contrato['data_fim'];
+    $observacao = $contrato['observacao'];
 
     if($_SERVER["REQUEST_METHOD"] == "POST"){
         $id_cliente = (int) trim($_POST["id_cliente"] ?? '');
@@ -31,32 +42,52 @@
 
         if($id_cliente <= 0){
             $erros[] = "Cliente inválido.";
-        }
-        if($id_preco <= 0){
-            $erros[] = "Preço inválido.";
-        }
-        else {
+        } else {
             $sql = 'SELECT id FROM clientes WHERE id = :id';
             $consulta = $pdo->prepare($sql);
-            $consulta->execute([':id' => $id_cliente]);
+            $consulta->execute([":id" => $id_cliente]);
 
-            if(!$consulta->fetch()){
+            if(!$consulta->fetchColumn()){
                 $erros[] = "Cliente não encontrado.";
             }
         }
-        if(empty($data_inicio) || empty($data_fim)){
-            $erros[] = "As datas de início e fim são obrigatórias.";
-        }
-        elseif($data_inicio > $data_fim){
-            $erros[] = "A data de início não pode ser maior que a data de fim.";
+        if($id_preco <= 0){
+            $erros[] = "Preço inválido.";
+        } else {
+            $sql = 'SELECT id FROM precos WHERE id = :id';
+            $consulta = $pdo->prepare($sql);
+            $consulta->execute([":id" => $id_preco]);
+
+            if(!$consulta->fetchColumn()){
+                $erros[] = "Tabela de preço não encontrada.";
+            }
         }
 
+        if(empty($erros)){
+            if(empty($data_inicio) || empty($data_fim)){
+                $erros[] = "As datas de início e fim são obrigatórias.";
+            }
+            elseif($data_inicio > $data_fim){
+                $erros[] = "A data de início não pode ser maior que a data de fim.";
+            }
+
+            if($id_preco != $contrato['id_preco']){
+                $sql = 'SELECT COUNT(*) FROM contrato_itens WHERE id_contrato = :id';
+                $consulta = $pdo->prepare($sql);
+                $consulta->execute([":id" => $id]);
+
+                if($consulta->fetchColumn() > 0){
+                    $erros[] = "Não é possível alterar a tabela de preços após adicionar equipamentos ao contrato.";
+                }
+            }
+        }
+        
         if(empty($erros)){
             try{
                 $status = calcularStatusContrato($data_inicio, $data_fim);
 
-                $sql = 'INSERT INTO contratos (id_cliente, id_preco, data_inicio, data_fim, status, observacao) 
-                        VALUES (:id_cliente, :id_preco, :data_inicio, :data_fim, :status, :observacao)';
+                $sql = 'UPDATE contratos SET id_cliente = :id_cliente, id_preco = :id_preco, data_inicio = :data_inicio, 
+                        data_fim = :data_fim, status = :status, observacao = :observacao WHERE id = :id';
                 $stmt = $pdo->prepare($sql);
 
                 $stmt->execute([
@@ -65,17 +96,17 @@
                     ":data_inicio" => $data_inicio,
                     ":data_fim" => $data_fim,
                     ":status" => $status,
-                    ":observacao" => $observacao
+                    ":observacao" => $observacao,
+                    ":id" => $id
                 ]);
 
-                $id_contrato = $pdo->lastInsertId();
-                registrarLog("Contrato criado: ID $id_contrato");
+                registrarLog("Contrato editado: ID $id");
 
-                header("Location: listar.php");
+                header("Location: ver.php?id=$id");
                 exit;
             }
             catch(PDOException $e){
-                $erros[] = "Erro ao cadastrar contrato.";
+                $erros[] = "Erro ao atualizar contrato.";
             }
         }
     }
@@ -83,7 +114,7 @@
     require_once '../layout/header.php';
 ?>
 
-<h2>Novo Contrato</h2>
+<h2>Editar Contrato Nº <?= str_pad($contrato['id'], 4, '0', STR_PAD_LEFT) ?></h2>
 
 <form method="POST">
     <label>Cliente:</label><br>
@@ -116,7 +147,7 @@
     <textarea name="observacao"><?= e($observacao ?? '') ?></textarea><br>
 
     <button type="submit">Salvar</button>
-    <a class="botao-cancelar" href="listar.php">Cancelar</a>
+    <a class="botao-cancelar" href="ver.php?id=<?= $id ?>">Cancelar</a>
 </form>
 
 <?php
@@ -124,5 +155,3 @@
         mostrarErros($erros);
     }
 ?>
-
-<?php require_once '../layout/footer.php'; ?>

@@ -5,7 +5,7 @@
 
     $id_contrato = obterId();
 
-    $sql = 'SELECT id FROM contratos WHERE id = :id';
+    $sql = 'SELECT id, id_preco FROM contratos WHERE id = :id';
     $consulta = $pdo->prepare($sql);
     $consulta->execute([':id' => $id_contrato]);
     $contrato = $consulta->fetch();
@@ -14,9 +14,15 @@
         die("Contrato não encontrado.");
     }
 
-    $sql = 'SELECT id, descricao, diaria FROM equipamentos WHERE ativo = 1';
+    if(empty($contrato['id_preco'])){
+        die("Contrato não possui tabela de preços vinculada.");
+    }
+
+    $sql = 'SELECT equipamentos.id, equipamentos.descricao, preco_itens.valor_diaria 
+            FROM equipamentos INNER JOIN preco_itens ON equipamentos.id = preco_itens.id_equipamento
+            WHERE equipamentos.ativo = 1 AND preco_itens.id_preco = :id_preco';
     $consulta = $pdo->prepare($sql);
-    $consulta->execute();
+    $consulta->execute([':id_preco' => $contrato['id_preco']]);
     $equipamentos = $consulta->fetchAll();
 
     $erros = [];
@@ -36,16 +42,16 @@
         }
 
         if(empty($erros)){
-            $sql = 'SELECT diaria FROM equipamentos WHERE id = :id AND ativo = 1';
+            $sql = 'SELECT preco_itens.valor_diaria FROM preco_itens WHERE id_equipamento = :id AND id_preco = :id_preco';
             $consulta = $pdo->prepare($sql);
-            $consulta->execute([":id" => $id_equipamento]);
+            $consulta->execute([":id" => $id_equipamento, ":id_preco" => $contrato['id_preco']]);
             $equipamento = $consulta->fetch();
 
             if(!$equipamento){
-                die("Equipamento não encontrado.");
+                $erros[] = "Este equipamento não possui preço cadastrado nesta tabela.";
             } else {
                 try{
-                    $diaria = $equipamento['diaria'];
+                    $diaria = $equipamento['valor_diaria'];
 
                     $sql = 'INSERT INTO contrato_itens (id_contrato, id_equipamento, diaria, qtd) 
                             VALUES (:id_contrato, :id_equipamento, :diaria, :qtd)';
@@ -73,7 +79,7 @@
     require_once '../layout/header.php';
 ?>
 
-<h2>Adicionar Item ao Contrato <?= $id_contrato ?></h2>
+<h2>Adicionar Item ao Contrato Nº <?= str_pad($contrato['id'], 4, '0', STR_PAD_LEFT) ?></h2>
 
 <form method="POST">
     <label>Equipamento:</label><br>
@@ -81,7 +87,7 @@
         <option value="" disabled <?= empty($id_equipamento) ? 'selected' : '' ?>>- Selecione um equipamento -</option>
         <?php foreach ($equipamentos as $equipamento): ?>
             <option value="<?= e($equipamento['id']) ?>" <?= $id_equipamento == $equipamento['id'] ? 'selected' : '' ?>>
-                <?= e($equipamento['descricao']) ?> (R$ <?= number_format($equipamento["diaria"], 2, ',', '.') ?>)
+                <?= e($equipamento['descricao']) ?> (R$ <?= number_format($equipamento["valor_diaria"], 2, ',', '.') ?>)
             </option>
         <?php endforeach; ?>
     </select><br>

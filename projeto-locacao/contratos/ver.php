@@ -4,8 +4,11 @@
 
     $id = obterId();
 
-    $sql = 'SELECT contratos.id, clientes.nome AS cliente, contratos.data_inicio, contratos.data_fim, contratos.status, contratos.observacao, contratos.created_at 
-            FROM contratos INNER JOIN clientes ON contratos.id_cliente = clientes.id
+    $sql = 'SELECT contratos.id, clientes.nome AS cliente, clientes.tipo_pessoa, clientes.cpf_cnpj, clientes.telefone, 
+            precos.nome AS tabela_preco, contratos.data_inicio, contratos.data_fim, 
+            contratos.status, contratos.observacao, contratos.created_at FROM contratos 
+            INNER JOIN clientes ON contratos.id_cliente = clientes.id
+            LEFT JOIN precos ON contratos.id_preco = precos.id
             WHERE contratos.id = :id';
 
     $consulta = $pdo->prepare($sql);
@@ -30,14 +33,23 @@
     require_once '../layout/header.php';
 ?>
 
-<h2>Detalhes do Contrato <?= $contrato['id'] ?></h2>
+<h2>Contrato Nº <?= str_pad($contrato['id'], 4, '0', STR_PAD_LEFT) ?></h2>
 
 <div>
-    <p><strong>Cliente:</strong> <?= e($contrato["cliente"]) ?></p>
-    <p><strong>Período:</strong> <?= date('d/m/Y', strtotime($contrato["data_inicio"])) ?> até <?= date('d/m/Y', strtotime($contrato["data_fim"])) ?> </p>
+    <h3>Cliente</h3>
+    <p><strong>Nome:</strong> <?= e($contrato["cliente"]) ?></p>
+    <p><strong><?= e($contrato["tipo_pessoa"] == 'F' ? 'CPF:' : 'CNPJ:') ?></strong> <?= e(formatarCpfCnpj($contrato["cpf_cnpj"])) ?></p>
+    <p><strong>Telefone:</strong> <?= e(formatarTelefone($contrato["telefone"])) ?></p><br>
+
+    <h3>Período</h3>
+    <p><?= date('d/m/Y', strtotime($contrato["data_inicio"])) ?> até <?= date('d/m/Y', strtotime($contrato["data_fim"])) ?> </p>
     <p><strong>Duração:</strong> <?= $total_dias ?> dias</p>
     <p><strong>Status:</strong> <span class="status <?= strtolower($status_atual) ?>"><?= e($status_atual) ?></span></p>
-    <p><strong>Observação:</strong> <?= !empty($contrato["observacao"]) ? e($contrato["observacao"]) : '-' ?></p>    
+    <p><strong>Tabela de Preços:</strong> <?= e($contrato["tabela_preco"] ?? '-') ?></p><br>
+
+    <h3>Informações Adicionais</h3>
+    <p><strong>Observação:</strong> <?= !empty($contrato["observacao"]) ? e($contrato["observacao"]) : '-' ?></p>
+    <p><strong>Cadastrado em:</strong> <?= date('d/m/Y - H:i', strtotime($contrato["created_at"])) ?></p>    
 </div>
 
 <br><a class="links" href="listar.php">Voltar para listagem</a>
@@ -54,6 +66,7 @@
             <th>Quantidade</th>
             <th>Subtotal por Dia</th>
             <th>Total do Período</th>
+            <th>Ações</th>
         </tr>
 
         <?php
@@ -70,14 +83,18 @@
                 <td><?= (int)$row["qtd"] ?></td>
                 <td>R$ <?= number_format($subtotal, 2, ',', '.') ?></td>
                 <td>R$ <?= number_format($total_periodo, 2, ',', '.') ?></td>
+                <td>
+                    <a class="botao-editar" href="editar_item.php?id=<?= (int)$row["id"] ?>">Editar</a>
+                    <a class="botao-excluir" href="excluir_item.php?id=<?= (int)$row["id"] ?>">Excluir</a>
+                </td>
             </tr>
         <?php endforeach; ?>
-
-        <tr>
-            <td colspan="5"><strong>Total do Contrato:</strong></td>
-            <td><strong>R$ <?= number_format($valor_total, 2, ',', '.') ?></strong></td>
-        </tr>
     </table>
+
+    <div class="total-contrato">
+        <strong>Total do Contrato:</strong>
+        <span>R$ <?= number_format($valor_total, 2, ',', '.') ?></span>
+    </div>
 
 <?php else: ?>
     <p>Nenhum equipamento foi registrado para este contrato ainda.</p>
