@@ -297,6 +297,30 @@ legend {
     font-size: 18px;
 }
 
+.filtros {
+   display: flex;
+   align-items: center;
+   gap: 12px;
+   flex-wrap: wrap; 
+}
+
+.filtros input{
+    flex: 1;
+    min-width: 280px;
+    width: auto;
+    padding: 10px;
+}
+
+.filtros select{
+    width: 180px;
+    padding: 10px;
+}
+
+.filtros button{
+    width: auto;
+    padding: 10px 20px;
+}
+
 footer {
     text-align: center;
     font-size: 14px;

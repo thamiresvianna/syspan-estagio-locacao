@@ -49,8 +49,28 @@
 
             if(!$equipamento){
                 $erros[] = "Este equipamento não possui preço cadastrado nesta tabela.";
-            } else {
-                try{
+            }
+        }
+
+        if(empty($erros)){
+            try {
+                $sqlCheck = 'SELECT id, qtd FROM contrato_itens WHERE id_contrato = :id_contrato AND id_equipamento = :id_equipamento';
+                $consultaCheck = $pdo->prepare($sqlCheck);
+                $consultaCheck->execute([":id_contrato" => $id_contrato, ":id_equipamento" => $id_equipamento]);
+                $item_existente = $consultaCheck->fetch();
+
+                if($item_existente){
+                    $sql = 'UPDATE contrato_itens SET qtd = qtd + :qtd, diaria = :diaria WHERE id = :id';
+                    $stmt = $pdo->prepare($sql);
+
+                    $stmt->execute([
+                        ":qtd" => $qtd,
+                        ":diaria" => $equipamento['valor_diaria'],
+                        ":id" => $item_existente['id']
+                    ]);
+
+                    registrarLog("Quantidade do item $id_equipamento atualizado ao contrato: $id_contrato");
+                } else {
                     $diaria = $equipamento['valor_diaria'];
 
                     $sql = 'INSERT INTO contrato_itens (id_contrato, id_equipamento, diaria, qtd) 
@@ -65,13 +85,13 @@
                     ]);
 
                     registrarLog("Item $id_equipamento adicionado ao contrato: $id_contrato");
+                }
 
-                    header("Location: ver.php?id=$id_contrato");
-                    exit;
-                }
-                catch(PDOException $e){
-                    $erros[] = "Erro ao cadastrar equipamento ao contrato.";
-                }
+                header("Location: ver.php?id=$id_contrato");
+                exit;
+            }
+            catch(PDOException $e){
+                $erros[] = "Erro ao cadastrar equipamento ao contrato.";
             }
         }
     }
