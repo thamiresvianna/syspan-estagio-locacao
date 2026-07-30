@@ -5,7 +5,7 @@
 
     $id_contrato = obterId();
 
-    $sql = 'SELECT id, id_preco FROM contratos WHERE id = :id';
+    $sql = 'SELECT id, id_preco, data_inicio, data_fim FROM contratos WHERE id = :id';
     $consulta = $pdo->prepare($sql);
     $consulta->execute([':id' => $id_contrato]);
     $contrato = $consulta->fetch();
@@ -14,16 +14,29 @@
         die("Contrato não encontrado.");
     }
 
+    $status = calcularStatusContrato($contrato['data_inicio'], $contrato['data_fim']);
+
+    if($status == "ENCERRADO"){
+        die("Não é possível adicionar equipamentos em um contrato encerrado.");
+    }
+
     if(empty($contrato['id_preco'])){
         die("Contrato não possui tabela de preços vinculada.");
     }
 
     $sql = 'SELECT equipamentos.id, equipamentos.descricao, preco_itens.valor_diaria 
             FROM equipamentos INNER JOIN preco_itens ON equipamentos.id = preco_itens.id_equipamento
-            WHERE equipamentos.ativo = 1 AND preco_itens.id_preco = :id_preco';
+            WHERE equipamentos.ativo = 1 AND preco_itens.id_preco = :id_preco
+            ORDER BY equipamentos.descricao';
     $consulta = $pdo->prepare($sql);
     $consulta->execute([':id_preco' => $contrato['id_preco']]);
     $equipamentos = $consulta->fetchAll();
+
+    $diarias_equipamentos = [];
+
+    foreach($equipamentos as $equipamento){
+        $diarias_equipamentos[$equipamento['id']] = $equipamento['valor_diaria'];
+    }
 
     $erros = [];
 
@@ -42,12 +55,7 @@
         }
 
         if(empty($erros)){
-            $sql = 'SELECT preco_itens.valor_diaria FROM preco_itens WHERE id_equipamento = :id AND id_preco = :id_preco';
-            $consulta = $pdo->prepare($sql);
-            $consulta->execute([":id" => $id_equipamento, ":id_preco" => $contrato['id_preco']]);
-            $equipamento = $consulta->fetch();
-
-            if(!$equipamento){
+            if(!isset($diarias_equipamentos[$id_equipamento])){
                 $erros[] = "Este equipamento não possui preço cadastrado nesta tabela.";
             }
         }
@@ -65,13 +73,13 @@
 
                     $stmt->execute([
                         ":qtd" => $qtd,
-                        ":diaria" => $equipamento['valor_diaria'],
+                        ":diaria" => $diarias_equipamentos[$id_equipamento],
                         ":id" => $item_existente['id']
                     ]);
 
                     registrarLog("Quantidade do item $id_equipamento atualizado ao contrato: $id_contrato");
                 } else {
-                    $diaria = $equipamento['valor_diaria'];
+                    $diaria = $diarias_equipamentos[$id_equipamento];
 
                     $sql = 'INSERT INTO contrato_itens (id_contrato, id_equipamento, diaria, qtd) 
                             VALUES (:id_contrato, :id_equipamento, :diaria, :qtd)';
@@ -99,6 +107,12 @@
     require_once '../layout/header.php';
 ?>
 
+<?php
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erros)) {
+        mostrarErros($erros);
+    }
+?>
+
 <h2>Adicionar Item ao Contrato Nº <?= str_pad($contrato['id'], 4, '0', STR_PAD_LEFT) ?></h2>
 
 <form method="POST">
@@ -118,11 +132,5 @@
     <button type="submit">Salvar</button>
     <a class="botao-cancelar" href="ver.php?id=<?= $id_contrato ?>">Cancelar</a>
 </form>
-
-<?php
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erros)) {
-        mostrarErros($erros);
-    }
-?>
 
 <?php require_once '../layout/footer.php'; ?>

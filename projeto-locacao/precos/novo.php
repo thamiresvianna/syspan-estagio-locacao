@@ -7,7 +7,7 @@
 
     $nome = '';
     $descricao = '';
-    $ativo = 0;
+    $ativo = 1;
 
     if($_SERVER["REQUEST_METHOD"] == "POST"){
         $nome = trim($_POST["nome"] ?? '');
@@ -41,6 +41,12 @@
     require_once '../layout/header.php';
 ?>
 
+<?php
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erros)) {
+        mostrarErros($erros);
+    }
+?>
+
 <h2>Inserir Tabela de Preços</h2>
 
 <form method="POST">
@@ -56,11 +62,5 @@
     <button type="submit">Salvar</button>
     <a class="botao-cancelar" href="listar.php">Cancelar</a>
 </form>
-
-<?php
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erros)) {
-        mostrarErros($erros);
-    }
-?>
 
 <?php require_once '../layout/footer.php'; ?>

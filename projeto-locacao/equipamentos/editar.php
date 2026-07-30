@@ -81,6 +81,12 @@
     require_once '../layout/header.php';
 ?>
 
+<?php
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erros)) {
+        mostrarErros($erros);
+    }
+?>
+
 <h2>Editar Equipamento</h2>
 
 <form method="POST" class="form-grid">
@@ -137,11 +143,5 @@
         <a class="botao-cancelar" href="listar.php">Cancelar</a>
     </div>
 </form>
-
-<?php
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erros)) {
-        mostrarErros($erros);
-    }
-?>
 
 <?php require_once '../layout/footer.php'; ?>

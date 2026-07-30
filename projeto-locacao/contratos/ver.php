@@ -6,7 +6,7 @@
 
     $sql = 'SELECT contratos.id, clientes.nome AS cliente, clientes.tipo_pessoa, clientes.cpf_cnpj, clientes.telefone, 
             precos.nome AS tabela_preco, contratos.data_inicio, contratos.data_fim, 
-            contratos.status, contratos.observacao, contratos.created_at FROM contratos 
+            contratos.status, contratos.observacao, contratos.created_at, contratos.updated_at FROM contratos 
             INNER JOIN clientes ON contratos.id_cliente = clientes.id
             LEFT JOIN precos ON contratos.id_preco = precos.id
             WHERE contratos.id = :id';
@@ -25,7 +25,8 @@
 
     $sqlItens = 'SELECT contrato_itens.id, contrato_itens.id_contrato, equipamentos.descricao AS equipamento, contrato_itens.diaria, contrato_itens.qtd
                 FROM contrato_itens INNER JOIN equipamentos ON contrato_itens.id_equipamento = equipamentos.id
-                WHERE contrato_itens.id_contrato = :id';
+                WHERE contrato_itens.id_contrato = :id
+                ORDER BY equipamentos.descricao ASC';
     $consultaItens = $pdo->prepare($sqlItens);
     $consultaItens->execute([':id' => $id]);
     $contratoItens = $consultaItens->fetchAll();
@@ -50,6 +51,7 @@
     <h3>Informações Adicionais</h3>
     <p><strong>Observação:</strong> <?= !empty($contrato["observacao"]) ? e($contrato["observacao"]) : '-' ?></p>
     <p><strong>Cadastrado em:</strong> <?= date('d/m/Y - H:i', strtotime($contrato["created_at"])) ?></p>    
+    <p><strong>Atualizado em:</strong> <?= !empty($contrato["updated_at"]) ? date('d/m/Y - H:i', strtotime($contrato["updated_at"])) : '-' ?></p>
 </div>
 
 <br><a class="links" href="listar.php">Voltar para listagem</a>

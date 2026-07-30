@@ -4,7 +4,8 @@
 
     $id = obterId();
 
-    $sql = 'SELECT id, tipo_pessoa, nome, cpf_cnpj, email, telefone, cep, endereco, numero, complemento, bairro, cidade, estado, observacao, created_at FROM clientes WHERE id = :id';
+    $sql = 'SELECT id, tipo_pessoa, nome, cpf_cnpj, email, telefone, cep, endereco, numero, 
+            complemento, bairro, cidade, estado, observacao, created_at,updated_at FROM clientes WHERE id = :id';
     $consulta = $pdo->prepare($sql);
     $consulta -> execute([':id' => $id]);
 
@@ -38,6 +39,7 @@
     <h3>Informações Adicionais</h3>
     <p><strong>Observação:</strong> <?= !empty($cliente["observacao"]) ? e($cliente["observacao"]) : '-' ?></p>
     <p><strong>Cadastrado em:</strong> <?= date('d/m/Y - H:i', strtotime($cliente["created_at"])) ?></p>
+    <p><strong>Atualizado em:</strong> <?= !empty($cliente["updated_at"]) ? date('d/m/Y - H:i', strtotime($cliente["updated_at"])) : '-' ?></p>
 </div>
 
 <br><a class="links" href="listar.php">Voltar</a>

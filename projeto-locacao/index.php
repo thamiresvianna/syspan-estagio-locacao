@@ -17,9 +17,14 @@
         <p>Cadastre, consulte, edite e exclua os equipamentos.</p>
     </a>
 
+    <a class="card-index" href="precos/listar.php">
+        <h4>Tabela de Preços</h4>
+        <p>Cadastre e gerencie as tabelas de preços dos equipamentos.</p>
+    </a>
+
     <a class="card-index" href="contratos/listar.php">
         <h4>Contratos</h4>
-        <p>Cadastre os contratos, adicione os equipamentos e acompanhe as locações.</p>
+        <p>Cadastre contratos, adicione equipamentos e acompanhe as locações.</p>
     </a>
 </div>
 

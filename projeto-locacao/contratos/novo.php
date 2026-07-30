@@ -31,11 +31,7 @@
 
         if($id_cliente <= 0){
             $erros[] = "Cliente inválido.";
-        }
-        if($id_preco <= 0){
-            $erros[] = "Preço inválido.";
-        }
-        else {
+        } else {
             $sql = 'SELECT id FROM clientes WHERE id = :id';
             $consulta = $pdo->prepare($sql);
             $consulta->execute([':id' => $id_cliente]);
@@ -44,6 +40,18 @@
                 $erros[] = "Cliente não encontrado.";
             }
         }
+        if($id_preco <= 0){
+            $erros[] = "Preço inválido.";
+        } else {
+            $sql = 'SELECT id FROM precos WHERE id = :id';
+            $consulta = $pdo->prepare($sql);
+            $consulta->execute([":id" => $id_preco]);
+
+            if(!$consulta->fetchColumn()){
+                $erros[] = "Tabela de preços não encontrada.";
+            }
+        }
+
         if(empty($data_inicio) || empty($data_fim)){
             $erros[] = "As datas de início e fim são obrigatórias.";
         }
@@ -83,6 +91,12 @@
     require_once '../layout/header.php';
 ?>
 
+<?php
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erros)) {
+        mostrarErros($erros);
+    }
+?>
+
 <h2>Novo Contrato</h2>
 
 <form method="POST">
@@ -118,11 +132,5 @@
     <button type="submit">Salvar</button>
     <a class="botao-cancelar" href="listar.php">Cancelar</a>
 </form>
-
-<?php
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erros)) {
-        mostrarErros($erros);
-    }
-?>
 
 <?php require_once '../layout/footer.php'; ?>

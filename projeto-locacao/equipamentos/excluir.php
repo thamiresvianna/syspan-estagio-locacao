@@ -53,6 +53,12 @@
     require_once '../layout/header.php';
 ?>
 
+<?php 
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erro)){
+        mostrarErros([$erro]);
+    }
+?>
+
 <h2>Excluir Equipamento</h2>
 
 <p>Tem certeza que deseja excluir o equipamento: <strong><?= e($equipamento["descricao"]) ?></strong>?</p>
@@ -61,11 +67,5 @@
     <button type="submit">Excluir</button>
     <a class="botao-cancelar" href="listar.php">Cancelar</a>
 </form>
-
-<?php 
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erro)){
-        mostrarErros([$erro]);
-    }
-?>
 
 <?php require_once '../layout/footer.php'; ?>

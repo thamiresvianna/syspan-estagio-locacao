@@ -26,7 +26,8 @@
 
     if($_SERVER["REQUEST_METHOD"] == "POST"){
         $id_equipamento = (int) trim($_POST["id_equipamento"] ?? '');
-        $valor_diaria = (float) trim($_POST["valor_diaria"] ?? 0);
+        $valor_diaria = str_replace(',', '.', trim($_POST["valor_diaria"] ?? 0));
+        $valor_diaria = (float) $valor_diaria;
 
         if($id_equipamento <= 0){
             $erros[] = "Equipamento inválido.";
@@ -69,13 +70,19 @@
                     exit;
                 }
                 catch(PDOException $e){
-                    $erros[] = "Erro ao cadastrar equipamento a tabela de preços.";
+                    $erros[] = "Erro ao adicionar equipamento à tabela de preços.";
                 }
             }
         }
     }
 
     require_once '../layout/header.php';
+?>
+
+<?php
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erros)) {
+        mostrarErros($erros);
+    }
 ?>
 
 <h2>Adicionar Item a Tabela de Preços <?= $id_preco ?></h2>
@@ -97,11 +104,5 @@
     <button type="submit">Salvar</button>
     <a class="botao-cancelar" href="ver.php?id=<?= $id_preco ?>">Cancelar</a>
 </form>
-
-<?php
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erros)) {
-        mostrarErros($erros);
-    }
-?>
 
 <?php require_once '../layout/footer.php'; ?>

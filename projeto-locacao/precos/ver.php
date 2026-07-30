@@ -4,7 +4,7 @@
 
     $id = obterId();
 
-    $sql = 'SELECT id, nome, descricao, ativo, created_at FROM precos WHERE id = :id';
+    $sql = 'SELECT id, nome, descricao, ativo, created_at, updated_at FROM precos WHERE id = :id';
 
     $consulta = $pdo->prepare($sql);
     $consulta->execute([':id' => $id]);
@@ -35,6 +35,7 @@
     <p><strong>Quantidade de equipamentos:</strong> <?= e($qtd_equipamentos) ?></p>
     <p><strong>Ativo:</strong> <?= e($preco["ativo"] ? 'Sim' : 'Não' ) ?> </p>
     <p><strong>Criado em:</strong> <?= date('d/m/Y - H:i', strtotime($preco["created_at"])) ?></p>
+    <p><strong>Atualizado em:</strong> <?= !empty($preco["updated_at"]) ? date('d/m/Y - H:i', strtotime($preco["updated_at"])) : '-' ?></p>
 </div>
 
 <br><a class="links" href="listar.php">Voltar para listagem</a>

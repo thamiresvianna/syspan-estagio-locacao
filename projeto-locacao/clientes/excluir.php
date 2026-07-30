@@ -5,7 +5,7 @@
 
     $id = obterId();
 
-    $sql = 'SELECT id, nome, email, telefone, created_at FROM clientes WHERE id = :id';
+    $sql = 'SELECT id, nome FROM clientes WHERE id = :id';
     $consulta = $pdo->prepare($sql);
     $consulta -> execute([':id' => $id]);
 
@@ -51,6 +51,12 @@
     require_once '../layout/header.php';
 ?>
 
+<?php 
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erro)){
+        mostrarErros([$erro]);
+    }
+?>
+
 <h2>Excluir Cliente</h2>
 
 <p>Tem certeza que deseja excluir o cliente: <strong><?= e($cliente["nome"]) ?></strong>?</p>
@@ -59,11 +65,5 @@
     <button type="submit">Excluir</button>
     <a class="botao-cancelar" href="listar.php">Cancelar</a>
 </form>
-
-<?php 
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erro)){
-        mostrarErros([$erro]);
-    }
-?>
 
 <?php require_once '../layout/footer.php'; ?>

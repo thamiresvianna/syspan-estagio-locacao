@@ -6,7 +6,8 @@
     $erros = [];
     $id = obterId();
 
-    $sql = 'SELECT id, tipo_pessoa, nome, cpf_cnpj, email, telefone, cep, endereco, numero, complemento, bairro, cidade, estado, observacao, created_at FROM clientes WHERE id = :id';
+    $sql = 'SELECT id, tipo_pessoa, nome, cpf_cnpj, email, telefone, cep, endereco, numero, 
+            complemento, bairro, cidade, estado, observacao FROM clientes WHERE id = :id';
     $consulta = $pdo->prepare($sql);
     $consulta -> execute([':id' => $id]);
 
@@ -103,6 +104,12 @@
     require_once '../layout/header.php';
 ?>
 
+<?php
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erros)) {
+        mostrarErros($erros);
+    }
+?>
+
 <h2>Editar Cliente</h2>
 
 <form method="POST" class="form-grid">
@@ -193,12 +200,6 @@
         <a class="botao-cancelar" href="listar.php">Cancelar</a>
     </div>
 </form>
-
-<?php
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erros)) {
-        mostrarErros($erros);
-    }
-?>
 
 <script>
     const campo_cep = document.getElementById("cep");

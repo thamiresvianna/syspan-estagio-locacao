@@ -34,7 +34,7 @@
                 $stmt->execute([":id" => $id]);
 
                 if($stmt->rowCount() === 0){
-                    die("Erro ao excluir tabela de preços.");
+                    $erro = "Erro ao excluir tabela de preços.";
                 }
 
                 registrarLog("Tabela de preços excluída: ID $id");
@@ -51,6 +51,12 @@
     require_once '../layout/header.php';
 ?>
 
+<?php 
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erro)){
+        mostrarErros([$erro]);
+    }
+?>
+
 <h2>Excluir Tabela de Preços</h2>
 
 <p>Tem certeza que deseja excluir a tabela de preços: <strong><?= e($precos["nome"]) ?></strong>?</p>
@@ -59,11 +65,5 @@
     <button type="submit">Excluir</button>
     <a class="botao-cancelar" href="listar.php">Cancelar</a>
 </form>
-
-<?php 
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erro)){
-        mostrarErros([$erro]);
-    }
-?>
 
 <?php require_once '../layout/footer.php'; ?>

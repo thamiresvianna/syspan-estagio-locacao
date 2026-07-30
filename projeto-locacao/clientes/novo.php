@@ -90,6 +90,12 @@
     require_once '../layout/header.php';
 ?>
 
+<?php
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erros)) {
+        mostrarErros($erros);
+    }
+?>
+
 <h2>Inserir Cliente</h2>
 
 <form method="POST" class="form-grid">
@@ -180,12 +186,6 @@
         <a class="botao-cancelar" href="listar.php">Cancelar</a>
     </div>
 </form>
-
-<?php
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erros)) {
-        mostrarErros($erros);
-    }
-?>
 
 <script>
     const campo_cep = document.getElementById("cep");

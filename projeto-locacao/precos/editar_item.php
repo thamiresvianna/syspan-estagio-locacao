@@ -21,7 +21,8 @@
     $valor_diaria = $item['valor_diaria'];
 
     if($_SERVER["REQUEST_METHOD"] == "POST"){
-        $valor_diaria = (float)trim($_POST["valor_diaria"] ?? 0);
+        $valor_diaria = str_replace(',', '.', trim($_POST["valor_diaria"] ?? 0));
+        $valor_diaria = (float) $valor_diaria;
 
         if($valor_diaria <= 0){
             $erros[] = "Valor da diária deve ser maior que zero.";
@@ -43,12 +44,18 @@
                 exit;
             }
             catch(PDOException $e){
-                $erro = "Erro ao editar valor da diária.";
+                $erros[] = "Erro ao editar valor da diária.";
             }
         }
     }
 
     require_once '../layout/header.php';
+?>
+
+<?php
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erros)) {
+        mostrarErros($erros);
+    }
 ?>
 
 <h2>Editar Valor da Diária</h2>
@@ -62,11 +69,5 @@
     <button type="submit">Salvar</button>
     <a class="botao-cancelar" href="ver.php?id=<?= (int)$item['id_preco'] ?>">Cancelar</a>
 </form>
-
-<?php
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erros)) {
-        mostrarErros($erros);
-    }
-?>
 
 <?php require_once '../layout/footer.php'; ?>

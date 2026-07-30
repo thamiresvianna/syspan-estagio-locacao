@@ -149,3 +149,6 @@ ALTER TABLE equipamentos ADD UNIQUE (codigo);
 
 INSERT INTO equipamentos (codigo, descricao, categoria, marca, modelo, numero_serie, ativo, observacao) 
 VALUES ('EQ0017', 'Gerador 10 kVA', 'Energia', 'Nagano', 'ND8GFLDE', 'NG10KVA-45896321', 1, 'Baixo consumo e alta durabilidade.');
+
+ALTER TABLE precos ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+ALTER TABLE contratos ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;

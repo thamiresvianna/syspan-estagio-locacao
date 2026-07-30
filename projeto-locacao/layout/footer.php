@@ -1,6 +1,6 @@
         <hr>
         <footer>
-            <p>Projeto Locação - <?= date('Y') ?></p>
+            <p>Projeto Locação v2.0 - <?= date('Y') ?></p>
         </footer>
     </body>
 

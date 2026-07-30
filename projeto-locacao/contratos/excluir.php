@@ -34,7 +34,7 @@
                 $stmt->execute([":id" => $id]);
 
                 if($stmt->rowCount() === 0){
-                    die("Erro ao excluir contrato.");
+                    $erro = "Erro ao excluir contrato.";
                 }
 
                 registrarLog("Contrato excluído: ID $id");
@@ -51,6 +51,12 @@
     require_once '../layout/header.php';
 ?>
 
+<?php 
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erro)){
+        mostrarErros([$erro]);
+    }
+?>
+
 <h2>Excluir Contrato Nº <?= str_pad($contrato['id'], 4, '0', STR_PAD_LEFT) ?></h2>
 
 <p>Tem certeza que deseja excluir o contrato: <strong>Nº <?= str_pad($contrato['id'], 4, '0', STR_PAD_LEFT) ?></strong>?</p>
@@ -59,11 +65,5 @@
     <button type="submit">Excluir</button>
     <a class="botao-cancelar" href="listar.php">Cancelar</a>
 </form>
-
-<?php 
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erro)){
-        mostrarErros([$erro]);
-    }
-?>
 
 <?php require_once '../layout/footer.php'; ?>

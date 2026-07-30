@@ -59,7 +59,7 @@
             $consulta->execute([":id" => $id_preco]);
 
             if(!$consulta->fetchColumn()){
-                $erros[] = "Tabela de preço não encontrada.";
+                $erros[] = "Tabela de preços não encontrada.";
             }
         }
 
@@ -114,6 +114,12 @@
     require_once '../layout/header.php';
 ?>
 
+<?php
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erros)) {
+        mostrarErros($erros);
+    }
+?>
+
 <h2>Editar Contrato Nº <?= str_pad($contrato['id'], 4, '0', STR_PAD_LEFT) ?></h2>
 
 <form method="POST">
@@ -149,11 +155,5 @@
     <button type="submit">Salvar</button>
     <a class="botao-cancelar" href="ver.php?id=<?= $id ?>">Cancelar</a>
 </form>
-
-<?php
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erros)) {
-        mostrarErros($erros);
-    }
-?>
 
 <?php require_once '../layout/footer.php'; ?>

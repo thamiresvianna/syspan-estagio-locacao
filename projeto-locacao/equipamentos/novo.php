@@ -11,7 +11,7 @@
     $marca = '';
     $modelo = '';
     $numero_serie = '';
-    $ativo = 0;
+    $ativo = 1;
     $observacao = '';
 
     if($_SERVER["REQUEST_METHOD"] == "POST"){
@@ -65,6 +65,12 @@
     }
 
     require_once '../layout/header.php';
+?>
+
+<?php
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erros)) {
+        mostrarErros($erros);
+    }
 ?>
 
 <h2>Inserir Equipamento</h2>
@@ -123,11 +129,5 @@
         <a class="botao-cancelar" href="listar.php">Cancelar</a>
     </div>
 </form>
-
-<?php
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erros)) {
-        mostrarErros($erros);
-    }
-?>
 
 <?php require_once '../layout/footer.php'; ?>

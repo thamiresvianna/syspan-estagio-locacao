@@ -6,7 +6,7 @@
     $erros = [];
     $id_item = obterId();
 
-    $sql = 'SELECT contrato_itens.id, contrato_itens.id_contrato, contrato_itens.id_equipamento, contrato_itens.diaria,contrato_itens.qtd FROM contrato_itens 
+    $sql = 'SELECT contrato_itens.id, contrato_itens.id_contrato, contrato_itens.id_equipamento, contrato_itens.diaria, contrato_itens.qtd FROM contrato_itens 
             WHERE contrato_itens.id = :id';
     $consulta = $pdo->prepare($sql);
     $consulta->execute([':id' => $id_item]);
@@ -17,10 +17,26 @@
         die("Item não encontrado.");
     }
 
+    $sql = 'SELECT id, data_inicio, data_fim FROM contratos WHERE id = :id';
+    $consulta = $pdo->prepare($sql);
+    $consulta->execute([':id' => $item['id_contrato']]);
+    $contrato = $consulta->fetch();
+
+    if(!$contrato){
+        die("Contrato não encontrado.");
+    }
+
+    $status = calcularStatusContrato($contrato['data_inicio'], $contrato['data_fim']);
+
+    if($status == "ENCERRADO"){
+        die("Não é possível editar itens de um contrato encerrado.");
+    }
+
     $sql = 'SELECT equipamentos.id, equipamentos.descricao, preco_itens.valor_diaria FROM equipamentos
             INNER JOIN preco_itens ON preco_itens.id_equipamento = equipamentos.id
             INNER JOIN contratos ON contratos.id_preco = preco_itens.id_preco
-            WHERE contratos.id = :id_contrato AND (equipamentos.ativo = 1 OR equipamentos.id = :id_equipamento)';
+            WHERE contratos.id = :id_contrato AND (equipamentos.ativo = 1 OR equipamentos.id = :id_equipamento)
+            ORDER BY equipamentos.descricao';
     $consulta = $pdo->prepare($sql);
     $consulta->execute([':id_contrato' => $item['id_contrato'], ':id_equipamento' => $item['id_equipamento']]);
 
@@ -54,6 +70,17 @@
         }
 
         if(empty($erros)){
+            $sqlCheck = 'SELECT id FROM contrato_itens WHERE id_contrato = :id_contrato AND id_equipamento = :id_equipamento AND id <> :id';
+            $consultaCheck = $pdo->prepare($sqlCheck);
+            $consultaCheck->execute([":id_contrato" => $item['id_contrato'], ":id_equipamento" => $id_equipamento, ":id" => $id_item]);
+            $item_existente = $consultaCheck->fetchColumn();
+
+            if($item_existente){
+                $erros[] = "Este equipamento já foi adicionado ao contrato.";
+            }
+        }
+
+        if(empty($erros)){
             try{
                 $sql = 'UPDATE contrato_itens SET id_equipamento = :id_equipamento, diaria = :diaria, qtd = :qtd WHERE id = :id';
                 $stmt = $pdo->prepare($sql);
@@ -71,12 +98,18 @@
                 exit;
             }
             catch(PDOException $e){
-                $erros[] = "Erro ao editar equipamento.";
+                $erros[] = "Erro ao editar item do contrato.";
             }
         }
     }
 
     require_once '../layout/header.php';
+?>
+
+<?php
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erros)) {
+        mostrarErros($erros);
+    }
 ?>
 
 <h2>Editar Item do Contrato</h2>
@@ -98,11 +131,5 @@
     <button type="submit">Salvar</button>
     <a class="botao-cancelar" href="ver.php?id=<?= (int)$item['id_contrato'] ?>">Cancelar</a>
 </form>
-
-<?php
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($erros)) {
-        mostrarErros($erros);
-    }
-?>
 
 <?php require_once '../layout/footer.php'; ?>
