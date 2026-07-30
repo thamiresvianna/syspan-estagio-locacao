@@ -64,12 +64,7 @@
         }
 
         if(empty($erros)){
-            if(empty($data_inicio) || empty($data_fim)){
-                $erros[] = "As datas de início e fim são obrigatórias.";
-            }
-            elseif($data_inicio > $data_fim){
-                $erros[] = "A data de início não pode ser maior que a data de fim.";
-            }
+            $erros = array_merge($erros, validarContrato($data_inicio, $data_fim));
 
             if($id_preco != $contrato['id_preco']){
                 $sql = 'SELECT COUNT(*) FROM contrato_itens WHERE id_contrato = :id';
@@ -102,7 +97,7 @@
 
                 registrarLog("Contrato editado: ID $id");
 
-                header("Location: ver.php?id=$id");
+                header("Location: ver.php?id=" . (int)$id);
                 exit;
             }
             catch(PDOException $e){
@@ -120,7 +115,7 @@
     }
 ?>
 
-<h2>Editar Contrato Nº <?= str_pad($contrato['id'], 4, '0', STR_PAD_LEFT) ?></h2>
+<h2>Editar Contrato Nº <?= numeroContrato($contrato['id']) ?></h2>
 
 <form method="POST">
     <label>Cliente:</label><br>
@@ -153,7 +148,7 @@
     <textarea name="observacao"><?= e($observacao ?? '') ?></textarea><br>
 
     <button type="submit">Salvar</button>
-    <a class="botao-cancelar" href="ver.php?id=<?= $id ?>">Cancelar</a>
+    <a class="botao-cancelar" href="ver.php?id=<?= (int)$id ?>">Cancelar</a>
 </form>
 
 <?php require_once '../layout/footer.php'; ?>

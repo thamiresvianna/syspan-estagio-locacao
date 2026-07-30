@@ -48,7 +48,7 @@
 
             registrarLog("Item do contrato excluído: ID $id_item");
 
-            header("Location: ver.php?id=".$item['id_contrato']);
+            header("Location: ver.php?id=" . (int)$item['id_contrato']);
             exit;
         }
         catch(PDOException $e){
@@ -65,7 +65,7 @@
     }
 ?>
 
-<h2>Excluir Item do Contrato Nº <?= str_pad($item['id_contrato'], 4, '0', STR_PAD_LEFT) ?></h2>
+<h2>Excluir Item do Contrato Nº <?= numeroContrato($contrato['id_contrato']) ?></h2>
 
 <p>Tem certeza que deseja excluir o item: <strong><?= e($item["descricao"]) ?></strong> deste contrato?</p>
 

@@ -57,7 +57,7 @@
     }
 ?>
 
-<h2>Excluir Contrato Nº <?= str_pad($contrato['id'], 4, '0', STR_PAD_LEFT) ?></h2>
+<h2>Excluir Contrato Nº <?= numeroContrato($contrato['id']) ?></h2>
 
 <p>Tem certeza que deseja excluir o contrato: <strong>Nº <?= str_pad($contrato['id'], 4, '0', STR_PAD_LEFT) ?></strong>?</p>
 

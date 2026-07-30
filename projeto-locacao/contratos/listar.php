@@ -110,9 +110,9 @@
                 <td><?= e($row["cliente"]) ?></td>
                 <td><?= e(formatarCpfCnpj($row["cpf_cnpj"])) ?></td>
                 <td><?= e((int)($row["quantidade"])) ?><?= $row["quantidade"] == 1 ? ' equipamento' : ' equipamentos' ?></td>
-                <td><?= e($row["tabela_preco"] ?? '-') ?></td>
+                <td><?= mostrarValor($row["tabela_preco"]) ?></td>
                 <td><span class="status <?= strtolower($status_atual) ?>"><?= e($status_atual) ?></span></td>
-                <td><?= date('d/m/Y H:i', strtotime($row["created_at"])) ?></td>
+                <td><?= formatarData($row["created_at"]) ?></td>
                 <td>
                     <a class="botao-ver" href="ver.php?id=<?= (int)$row["id"] ?>">Ver Itens</a>
                     <a class="botao-editar" href="editar.php?id=<?= (int)$row["id"] ?>">Editar</a>

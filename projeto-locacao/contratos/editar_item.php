@@ -49,12 +49,7 @@
         $id_equipamento = (int) trim($_POST["id_equipamento"] ?? '');
         $qtd = (int) trim($_POST["qtd"] ?? '');
 
-        if($id_equipamento <= 0){
-            $erros[] = "Equipamento inválido.";
-        }
-        if($qtd <= 0){
-            $erros[] = "Quantidade deve ser maior que zero.";
-        }
+        $erros = validarContratoItem($id_equipamento, $qtd);
 
         if(empty($erros)){
             $sql = 'SELECT preco_itens.valor_diaria FROM preco_itens 
@@ -94,7 +89,7 @@
 
                 registrarLog("Item do contrato editado: ID $id_item");
 
-                header("Location: ver.php?id=".$item['id_contrato']);
+                header("Location: ver.php?id=". (int)$item['id_contrato']);
                 exit;
             }
             catch(PDOException $e){
@@ -120,7 +115,7 @@
         <option value="" disabled <?= empty($id_equipamento) ? 'selected' : '' ?>>- Selecione um equipamento -</option>
         <?php foreach ($equipamentos as $equipamento): ?>
             <option value="<?= e($equipamento['id']) ?>" <?= $id_equipamento == $equipamento['id'] ? 'selected' : '' ?>>
-                <?= e($equipamento['descricao']) ?> (R$ <?= number_format($equipamento["valor_diaria"], 2, ',', '.') ?>)
+                <?= e($equipamento['descricao']) ?> (R$ <?= formatarMoeda($equipamento["valor_diaria"]) ?>)
             </option>
         <?php endforeach; ?>
     </select><br>

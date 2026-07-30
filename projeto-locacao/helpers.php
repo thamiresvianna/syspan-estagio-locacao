@@ -42,8 +42,99 @@
         }
     }
 
+    function mostrarValor(mixed $valor): string {
+        return !empty($valor) ? e($valor) : '-';
+    }
+
+    function numeroContrato(int $id): string {
+        return str_pad((string)$id, 4, '0', STR_PAD_LEFT);
+    }
+
     function limparNumeros(string $valor): string {
         return preg_replace('/\D/', '', $valor) ?? '';
+    }
+
+    function normalizarDecimal(string $valor): float {
+        $valor = trim($valor);
+
+        if(str_contains($valor, ',')){
+            $valor = str_replace('.', '', $valor);
+            $valor = str_replace(',', '.', $valor);
+        }
+
+        return (float) $valor;
+    }
+
+    function formatarMoeda(float $valor): string {
+        return number_format($valor, 2, ',', '.');
+    }
+
+    function formatarInputDecimal(float $valor): string {
+        return number_format($valor, 2, '.', '');
+    }
+
+    function formatarCpfCnpj(string $cpf_cnpj): string {
+        $cpf_cnpj = limparNumeros($cpf_cnpj);
+
+        if(strlen($cpf_cnpj) === 11){
+            return preg_replace('/(\d{3})(\d{3})(\d{3})(\d{2})/', '$1.$2.$3-$4', $cpf_cnpj) ?? $cpf_cnpj;
+        }
+        if(strlen($cpf_cnpj) === 14){
+            return preg_replace('/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/', '$1.$2.$3/$4-$5', $cpf_cnpj) ?? $cpf_cnpj;
+        }
+
+        return $cpf_cnpj;
+    }
+
+    function formatarTelefone(string $telefone): string {
+        $telefone = limparNumeros($telefone);
+
+        if(strlen($telefone) === 10){
+            return preg_replace('/(\d{2})(\d{4})(\d{4})/', '($1) $2-$3', $telefone) ?? $telefone;
+        }
+        if(strlen($telefone) === 11){
+            return preg_replace('/(\d{2})(\d{5})(\d{4})/', '($1) $2-$3', $telefone) ?? $telefone;
+        }
+
+        return $telefone;
+    }
+
+    function formatarCep(string $cep): string {
+        $cep = limparNumeros($cep);
+
+        if(strlen($cep) === 8){
+            return preg_replace('/(\d{5})(\d{3})/', '$1-$2', $cep) ?? $cep;
+        }
+
+        return $cep;
+    }
+
+    function formatarData(?string $data): string {
+        if(empty($data)){
+            return '-';
+        }
+
+        $timestamp = strtotime($data);
+
+        if($timestamp === false){
+            return '-';
+        }
+
+        return date('d/m/Y - H:i',$timestamp);
+    }
+
+    function formatarDataSimples(?string $data): string {
+        if(empty($data)){
+            return '-';
+        }
+
+        $timestamp = strtotime($data);
+
+        if($timestamp === false){
+            return '-';
+        }
+
+        return date('d/m/Y',$timestamp);
     }
 
     function validarCliente(string $tipo_pessoa, string $nome, string $cpf_cnpj, string $email, 
@@ -166,32 +257,6 @@
         return true;
     }
 
-    function formatarCpfCnpj(string $cpf_cnpj): string {
-        $cpf_cnpj = limparNumeros($cpf_cnpj);
-
-        if(strlen($cpf_cnpj) === 11){
-            return preg_replace('/(\d{3})(\d{3})(\d{3})(\d{2})/', '$1.$2.$3-$4', $cpf_cnpj) ?? $cpf_cnpj;
-        }
-        if(strlen($cpf_cnpj) === 14){
-            return preg_replace('/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/', '$1.$2.$3/$4-$5', $cpf_cnpj) ?? $cpf_cnpj;
-        }
-
-        return $cpf_cnpj;
-    }
-
-    function formatarTelefone(string $telefone): string {
-        $telefone = limparNumeros($telefone);
-
-        if(strlen($telefone) === 10){
-            return preg_replace('/(\d{2})(\d{4})(\d{4})/', '($1) $2-$3', $telefone) ?? $telefone;
-        }
-        if(strlen($telefone) === 11){
-            return preg_replace('/(\d{2})(\d{5})(\d{4})/', '($1) $2-$3', $telefone) ?? $telefone;
-        }
-
-        return $telefone;
-    }
-
     function validarEquipamento(string $codigo, string $descricao, string $categoria, 
                                 string $marca, string $modelo, string $numero_serie): array {
         $erros = [];
@@ -239,6 +304,49 @@
         }
         if(!empty($descricao) && (strlen($descricao) < 3 || strlen($descricao) > 255)){
             $erros[] = "Descrição deve conter entre 3 e 255 caracteres.";
+        }
+
+        return $erros;
+    }
+
+    function validarPrecoItem(int $id_equipamento, float $valor_diaria): array {
+        $erros = [];
+
+        if($id_equipamento <= 0){
+            $erros[] = "Equipamento inválido.";
+        }
+        if($valor_diaria <= 0){
+            $erros[] = "Valor da diária deve ser maior que zero.";
+        }
+
+        return $erros;
+    }
+
+    function validarContrato(string $data_inicio, string $data_fim): array {
+        $erros = [];
+
+        $data_inicio = DateTime::createFromFormat('Y-m-d', trim($data_inicio));
+        $data_fim = DateTime::createFromFormat('Y-m-d', trim($data_fim));
+
+        if(!$data_inicio || !$data_fim){
+            $erros[] = "As datas de início e fim são obrigatórias.";
+            return $erros;
+        }
+        if($data_inicio > $data_fim){
+            $erros[] = "A data de início não pode ser maior que a data de fim.";
+        }
+
+        return $erros;
+    }
+
+    function validarContratoItem(int $id_equipamento, int $qtd): array {
+        $erros = [];
+
+        if($id_equipamento <= 0){
+            $erros[] = "Equipamento inválido.";
+        }
+        if($qtd <= 0){
+            $erros[] = "Quantidade deve ser maior que zero.";
         }
 
         return $erros;

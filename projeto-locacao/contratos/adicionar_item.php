@@ -47,12 +47,7 @@
         $id_equipamento = (int) trim($_POST["id_equipamento"] ?? '');
         $qtd = (int) trim($_POST["qtd"] ?? '');
 
-        if($id_equipamento <= 0){
-            $erros[] = "Equipamento inválido.";
-        }
-        if($qtd <= 0){
-            $erros[] = "Quantidade deve ser maior que zero.";
-        }
+        $erros = validarContratoItem($id_equipamento, $qtd);
 
         if(empty($erros)){
             if(!isset($diarias_equipamentos[$id_equipamento])){
@@ -95,7 +90,7 @@
                     registrarLog("Item $id_equipamento adicionado ao contrato: $id_contrato");
                 }
 
-                header("Location: ver.php?id=$id_contrato");
+                header("Location: ver.php?id=" . (int)$id_contrato);
                 exit;
             }
             catch(PDOException $e){
@@ -113,7 +108,7 @@
     }
 ?>
 
-<h2>Adicionar Item ao Contrato Nº <?= str_pad($contrato['id'], 4, '0', STR_PAD_LEFT) ?></h2>
+<h2>Adicionar Item ao Contrato Nº <?= numeroContrato($contrato['id']) ?></h2>
 
 <form method="POST">
     <label>Equipamento:</label><br>
@@ -121,7 +116,7 @@
         <option value="" disabled <?= empty($id_equipamento) ? 'selected' : '' ?>>- Selecione um equipamento -</option>
         <?php foreach ($equipamentos as $equipamento): ?>
             <option value="<?= e($equipamento['id']) ?>" <?= $id_equipamento == $equipamento['id'] ? 'selected' : '' ?>>
-                <?= e($equipamento['descricao']) ?> (R$ <?= number_format($equipamento["valor_diaria"], 2, ',', '.') ?>)
+                <?= e($equipamento['descricao']) ?> (R$ <?= formatarMoeda($equipamento["valor_diaria"]) ?>)
             </option>
         <?php endforeach; ?>
     </select><br>
@@ -130,7 +125,7 @@
     <input type="number" name="qtd" min="1" value="<?= e($qtd ?? '') ?>" required><br>
 
     <button type="submit">Salvar</button>
-    <a class="botao-cancelar" href="ver.php?id=<?= $id_contrato ?>">Cancelar</a>
+    <a class="botao-cancelar" href="ver.php?id=<?= (int)$id_contrato ?>">Cancelar</a>
 </form>
 
 <?php require_once '../layout/footer.php'; ?>

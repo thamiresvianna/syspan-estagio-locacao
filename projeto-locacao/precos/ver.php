@@ -34,8 +34,8 @@
     <p><strong>Descrição:</strong> <?= e($preco["descricao"]) ?></p>
     <p><strong>Quantidade de equipamentos:</strong> <?= e($qtd_equipamentos) ?></p>
     <p><strong>Ativo:</strong> <?= e($preco["ativo"] ? 'Sim' : 'Não' ) ?> </p>
-    <p><strong>Criado em:</strong> <?= date('d/m/Y - H:i', strtotime($preco["created_at"])) ?></p>
-    <p><strong>Atualizado em:</strong> <?= !empty($preco["updated_at"]) ? date('d/m/Y - H:i', strtotime($preco["updated_at"])) : '-' ?></p>
+    <p><strong>Criado em:</strong> <?= formatarData($preco["created_at"]) ?></p>
+    <p><strong>Atualizado em:</strong> <?= mostrarValor(formatarData($preco["updated_at"])) ?></p>
 </div>
 
 <br><a class="links" href="listar.php">Voltar para listagem</a>
@@ -56,7 +56,7 @@
             <tr>
                 <td><?= (int)$row["id"] ?></td>
                 <td><?= e($row["equipamento"]) ?></td>
-                <td>R$ <?= number_format($row["valor_diaria"], 2, ',', '.') ?></td>
+                <td>R$ <?= formatarMoeda((float)$row["valor_diaria"]) ?></td>
                 <td>
                     <a class="botao-editar" href="editar_item.php?id=<?= (int)$row["id"] ?>">Editar</a>
                     <a class="botao-excluir" href="excluir_item.php?id=<?= (int)$row["id"] ?>">Excluir</a>

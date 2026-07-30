@@ -26,15 +26,10 @@
 
     if($_SERVER["REQUEST_METHOD"] == "POST"){
         $id_equipamento = (int) trim($_POST["id_equipamento"] ?? '');
-        $valor_diaria = str_replace(',', '.', trim($_POST["valor_diaria"] ?? 0));
+        $valor_diaria = normalizarDecimal((string)($_POST["valor_diaria"] ?? '0'));
         $valor_diaria = (float) $valor_diaria;
 
-        if($id_equipamento <= 0){
-            $erros[] = "Equipamento inválido.";
-        }
-        if($valor_diaria <= 0){
-            $erros[] = "Valor da diária deve ser maior que zero.";
-        }
+        $erros = validarPrecoItem($id_equipamento, $valor_diaria);
 
         $sql = 'SELECT COUNT(*) FROM preco_itens WHERE id_preco = :id_preco AND id_equipamento = :id_equipamento';
         $consulta = $pdo->prepare($sql);
@@ -66,7 +61,7 @@
 
                     registrarLog("Item $id_equipamento adicionado a tabela de preços: $id_preco");
 
-                    header("Location: ver.php?id=$id_preco");
+                    header("Location: ver.php?id=" . (int)$id_preco);
                     exit;
                 }
                 catch(PDOException $e){
@@ -99,10 +94,10 @@
     </select><br>
 
     <label>Valor da Diária:</label><br>
-    <input type="number" name="valor_diaria" step="0.01" min="0.01" value="<?= e(number_format($valor_diaria, 2, '.', '')) ?>" required><br>
+    <input type="number" name="valor_diaria" step="0.01" min="0.01" value="<?= e(formatarInputDecimal($valor_diaria)) ?>" required><br>
 
     <button type="submit">Salvar</button>
-    <a class="botao-cancelar" href="ver.php?id=<?= $id_preco ?>">Cancelar</a>
+    <a class="botao-cancelar" href="ver.php?id=<?= (int)$id_preco ?>">Cancelar</a>
 </form>
 
 <?php require_once '../layout/footer.php'; ?>

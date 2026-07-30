@@ -63,10 +63,10 @@
                 <td><?= e(formatarCpfCnpj($row["cpf_cnpj"])) ?></td>
                 <td><?= e($row["email"]) ?></td>
                 <td><?= e(formatarTelefone($row["telefone"])) ?></td>
-                <td><?= !empty($row["cep"]) ? e($row["cep"]) : '-' ?></td>
-                <td><?= !empty($row["cidade"]) ? e($row["cidade"]) : '-' ?></td>
-                <td><?= !empty($row["estado"]) ? e($row["estado"]) : '-' ?></td>
-                <td><?= date('d/m/Y H:i', strtotime($row["created_at"])) ?></td>
+                <td><?= mostrarValor($row["cep"]) ?></td>
+                <td><?= mostrarValor($row["cidade"]) ?></td>
+                <td><?= mostrarValor($row["estado"]) ?></td>
+                <td><?= formatarData($row["created_at"]) ?></td>
                 <td>
                     <a class="botao-ver" href="ver.php?id=<?= (int)$row["id"] ?>">Visualizar</a>
                     <a class="botao-editar" href="editar.php?id=<?= (int)$row["id"] ?>">Editar</a>

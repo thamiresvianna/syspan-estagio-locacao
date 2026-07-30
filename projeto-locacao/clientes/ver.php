@@ -28,18 +28,18 @@
     <p><strong>Telefone:</strong> <?= e(formatarTelefone($cliente["telefone"])) ?></p><br>
 
     <h3>Endereço</h3>
-    <p><strong>CEP:</strong> <?= !empty($cliente["cep"]) ? e($cliente["cep"]) : '-' ?></p>
-    <p><strong>Endereço:</strong> <?= !empty($cliente["endereco"]) ? e($cliente["endereco"]) : '-' ?></p>
-    <p><strong>Número:</strong> <?= !empty($cliente["numero"]) ? e($cliente["numero"]) : '-' ?></p>
-    <p><strong>Complemento:</strong> <?= !empty($cliente["complemento"]) ? e($cliente["complemento"]) : '-' ?></p>
-    <p><strong>Bairro:</strong> <?= !empty($cliente["bairro"]) ? e($cliente["bairro"]) : '-' ?></p>
-    <p><strong>Cidade:</strong> <?= !empty($cliente["cidade"]) ? e($cliente["cidade"]) : '-' ?></p>
-    <p><strong>Estado:</strong> <?= !empty($cliente["estado"]) ? e($cliente["estado"]) : '-' ?></p><br>
+    <p><strong>CEP:</strong> <?= mostrarValor(formatarCep($cliente["cep"])) ?></p>
+    <p><strong>Endereço:</strong> <?= mostrarValor($cliente["endereco"]) ?></p>
+    <p><strong>Número:</strong> <?= mostrarValor($cliente["numero"]) ?></p>
+    <p><strong>Complemento:</strong> <?= mostrarValor($cliente["complemento"]) ?></p>
+    <p><strong>Bairro:</strong> <?= mostrarValor($cliente["bairro"]) ?></p>
+    <p><strong>Cidade:</strong> <?= mostrarValor($cliente["cidade"]) ?></p>
+    <p><strong>Estado:</strong> <?= mostrarValor($cliente["estado"]) ?></p><br>
 
     <h3>Informações Adicionais</h3>
-    <p><strong>Observação:</strong> <?= !empty($cliente["observacao"]) ? e($cliente["observacao"]) : '-' ?></p>
-    <p><strong>Cadastrado em:</strong> <?= date('d/m/Y - H:i', strtotime($cliente["created_at"])) ?></p>
-    <p><strong>Atualizado em:</strong> <?= !empty($cliente["updated_at"]) ? date('d/m/Y - H:i', strtotime($cliente["updated_at"])) : '-' ?></p>
+    <p><strong>Observação:</strong> <?= mostrarValor($cliente["observacao"]) ?></p>
+    <p><strong>Cadastrado em:</strong> <?= formatarData($cliente["created_at"]) ?></p>
+    <p><strong>Atualizado em:</strong> <?= mostrarValor(formatarData($cliente["updated_at"])) ?></p>
 </div>
 
 <br><a class="links" href="listar.php">Voltar</a>

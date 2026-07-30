@@ -6,7 +6,7 @@
     $erros = [];
     $id_item = obterId();
 
-    $sql = 'SELECT preco_itens.id, preco_itens.id_preco, equipamentos.descricao, preco_itens.valor_diaria FROM preco_itens 
+    $sql = 'SELECT preco_itens.id, preco_itens.id_preco, preco_itens.id_equipamento, equipamentos.descricao, preco_itens.valor_diaria FROM preco_itens 
             INNER JOIN equipamentos ON preco_itens.id_equipamento = equipamentos.id 
             WHERE preco_itens.id = :id';
     $consulta = $pdo->prepare($sql);
@@ -18,15 +18,13 @@
         die("Item não encontrado.");
     }
 
-    $valor_diaria = $item['valor_diaria'];
+    $valor_diaria = (float)$item['valor_diaria'];
 
     if($_SERVER["REQUEST_METHOD"] == "POST"){
-        $valor_diaria = str_replace(',', '.', trim($_POST["valor_diaria"] ?? 0));
+        $valor_diaria = normalizarDecimal((string)($_POST["valor_diaria"] ?? '0'));
         $valor_diaria = (float) $valor_diaria;
 
-        if($valor_diaria <= 0){
-            $erros[] = "Valor da diária deve ser maior que zero.";
-        }
+        $erros = validarPrecoItem($item['id_equipamento'], $valor_diaria);
 
         if(empty($erros)){
             try{
@@ -40,7 +38,7 @@
 
                 registrarLog("Item da tabela de preços editada: ID $id_item");
 
-                header("Location: ver.php?id=".$item['id_preco']);
+                header("Location: ver.php?id=" . (int)$item['id_preco']);
                 exit;
             }
             catch(PDOException $e){
@@ -64,7 +62,7 @@
     <p><strong>Equipamento:</strong> <?= e($item["descricao"]) ?></p><br>
 
     <label>Valor da Diária:</label><br>
-    <input type="number" name="valor_diaria" step="0.01" min="0.01" value="<?= e(number_format($valor_diaria, 2, '.', '')) ?>" required><br>
+    <input type="number" name="valor_diaria" step="0.01" min="0.01" value="<?= e(formatarInputDecimal($valor_diaria)) ?>" required><br>
 
     <button type="submit">Salvar</button>
     <a class="botao-cancelar" href="ver.php?id=<?= (int)$item['id_preco'] ?>">Cancelar</a>

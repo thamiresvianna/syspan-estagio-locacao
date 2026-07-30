@@ -34,7 +34,7 @@
     require_once '../layout/header.php';
 ?>
 
-<h2>Contrato Nº <?= str_pad($contrato['id'], 4, '0', STR_PAD_LEFT) ?></h2>
+<h2>Contrato Nº <?= numeroContrato($contrato['id']) ?></h2>
 
 <div>
     <h3>Cliente</h3>
@@ -43,15 +43,15 @@
     <p><strong>Telefone:</strong> <?= e(formatarTelefone($contrato["telefone"])) ?></p><br>
 
     <h3>Período</h3>
-    <p><?= date('d/m/Y', strtotime($contrato["data_inicio"])) ?> até <?= date('d/m/Y', strtotime($contrato["data_fim"])) ?> </p>
+    <p><?= formatarDataSimples($contrato["data_inicio"]) ?> até <?= formatarDataSimples($contrato["data_fim"]) ?> </p>
     <p><strong>Duração:</strong> <?= $total_dias ?> dias</p>
     <p><strong>Status:</strong> <span class="status <?= strtolower($status_atual) ?>"><?= e($status_atual) ?></span></p>
-    <p><strong>Tabela de Preços:</strong> <?= e($contrato["tabela_preco"] ?? '-') ?></p><br>
+    <p><strong>Tabela de Preços:</strong> <?= mostrarValor($contrato["tabela_preco"]) ?></p><br>
 
     <h3>Informações Adicionais</h3>
-    <p><strong>Observação:</strong> <?= !empty($contrato["observacao"]) ? e($contrato["observacao"]) : '-' ?></p>
-    <p><strong>Cadastrado em:</strong> <?= date('d/m/Y - H:i', strtotime($contrato["created_at"])) ?></p>    
-    <p><strong>Atualizado em:</strong> <?= !empty($contrato["updated_at"]) ? date('d/m/Y - H:i', strtotime($contrato["updated_at"])) : '-' ?></p>
+    <p><strong>Observação:</strong> <?= mostrarValor($contrato["observacao"]) ?></p>
+    <p><strong>Cadastrado em:</strong> <?= formatarData($contrato["created_at"]) ?></p>    
+    <p><strong>Atualizado em:</strong> <?= mostrarValor(formatarData($contrato["updated_at"])) ?></p>
 </div>
 
 <br><a class="links" href="listar.php">Voltar para listagem</a>
@@ -81,10 +81,10 @@
             <tr>
                 <td><?= (int)$row["id"] ?></td>
                 <td><?= e($row["equipamento"]) ?></td>
-                <td>R$ <?= number_format($row["diaria"], 2, ',', '.') ?></td>
+                <td>R$ <?= formatarMoeda($row["diaria"]) ?></td>
                 <td><?= (int)$row["qtd"] ?></td>
-                <td>R$ <?= number_format($subtotal, 2, ',', '.') ?></td>
-                <td>R$ <?= number_format($total_periodo, 2, ',', '.') ?></td>
+                <td>R$ <?= formatarMoeda($subtotal) ?></td>
+                <td>R$ <?= formatarMoeda($total_periodo) ?></td>
                 <td>
                     <a class="botao-editar" href="editar_item.php?id=<?= (int)$row["id"] ?>">Editar</a>
                     <a class="botao-excluir" href="excluir_item.php?id=<?= (int)$row["id"] ?>">Excluir</a>
@@ -95,7 +95,7 @@
 
     <div class="total-contrato">
         <strong>Total do Contrato:</strong>
-        <span>R$ <?= number_format($valor_total, 2, ',', '.') ?></span>
+        <span>R$ <?= formatarMoeda($valor_total) ?></span>
     </div>
 
 <?php else: ?>

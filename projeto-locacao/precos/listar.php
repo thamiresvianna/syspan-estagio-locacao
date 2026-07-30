@@ -60,7 +60,7 @@
                 <td><?= e($row["descricao"]) ?></td>
                 <td><?= e((int)($row["quantidade"])) ?></td>
                 <td><?= $row["ativo"] ? 'Sim' : 'Não' ?></td>
-                <td><?= date('d/m/Y H:i', strtotime($row["created_at"])) ?></td>
+                <td><?= formatarData($row["created_at"]) ?></td>
                 <td>
                     <a class="botao-ver" href="ver.php?id=<?= (int)$row["id"] ?>">Ver Itens</a>
                     <a class="botao-editar" href="editar.php?id=<?= (int)$row["id"] ?>">Editar</a>

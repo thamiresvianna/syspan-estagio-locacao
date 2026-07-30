@@ -41,7 +41,7 @@
 
                 registrarLog("Item da tabela de preços excluído: ID $id_item");
 
-                header("Location: ver.php?id=".$item['id_preco']);
+                header("Location: ver.php?id=" . (int)$item['id_preco']);
                 exit;
             }
             catch(PDOException $e){
@@ -65,7 +65,7 @@
 
 <form method="POST">
     <button type="submit">Excluir</button>
-    <a class="botao-cancelar" href="ver.php?id=<?= $item['id_preco'] ?>">Cancelar</a>
+    <a class="botao-cancelar" href="ver.php?id=<?= (int)$item['id_preco'] ?>">Cancelar</a>
 </form>
 
 <?php require_once '../layout/footer.php'; ?>

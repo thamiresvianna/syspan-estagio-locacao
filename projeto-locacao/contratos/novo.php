@@ -52,12 +52,7 @@
             }
         }
 
-        if(empty($data_inicio) || empty($data_fim)){
-            $erros[] = "As datas de início e fim são obrigatórias.";
-        }
-        elseif($data_inicio > $data_fim){
-            $erros[] = "A data de início não pode ser maior que a data de fim.";
-        }
+        $erros = array_merge($erros, validarContrato($data_inicio, $data_fim));
 
         if(empty($erros)){
             try{
