@@ -70,7 +70,7 @@
 
     <div class="paginacao">
         <?php for($i=1; $i <= $total_paginas; $i++): ?>
-            <a href="?pagina=<?= $i ?>&busca=<?= e($busca) ?>" class="<?= $i == $pagina ? 'ativa' : '' ?>"><?= $i ?></a>
+            <a href="?pagina=<?= $i ?>&busca=<?= urlencode($busca) ?>" class="<?= $i == $pagina ? 'ativa' : '' ?>"><?= $i ?></a>
         <?php endfor; ?>
     </div>
 
