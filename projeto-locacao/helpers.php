@@ -99,7 +99,11 @@
         return $telefone;
     }
 
-    function formatarCep(string $cep): string {
+    function formatarCep(?string $cep): string {
+        if(empty($cep)){
+            return '-';
+        }
+
         $cep = limparNumeros($cep);
 
         if(strlen($cep) === 8){

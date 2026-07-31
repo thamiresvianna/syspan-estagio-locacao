@@ -8,7 +8,7 @@
 
     $busca  = trim($_GET['busca'] ?? '');
 
-    $sql = 'SELECT id, tipo_pessoa, nome, cpf_cnpj, email, telefone, cep, cidade, estado, created_at FROM clientes 
+    $sql = 'SELECT id, tipo_pessoa, nome, cpf_cnpj, email, telefone, cep, cidade, estado FROM clientes 
             WHERE nome LIKE :busca OR cpf_cnpj LIKE :busca OR email LIKE :busca
             ORDER BY nome ASC LIMIT :registros_pagina OFFSET :offset';
     $consulta = $pdo->prepare($sql);
@@ -51,7 +51,6 @@
             <th>CEP</th>
             <th>Cidade</th>
             <th>Estado</th>
-            <th>Data de Cadastro</th>
             <th>Ações</th>
         </tr>
 
@@ -63,10 +62,9 @@
                 <td><?= e(formatarCpfCnpj($row["cpf_cnpj"])) ?></td>
                 <td><?= e($row["email"]) ?></td>
                 <td><?= e(formatarTelefone($row["telefone"])) ?></td>
-                <td><?= mostrarValor($row["cep"]) ?></td>
+                <td><?= mostrarValor(formatarCep($row["cep"])) ?></td>
                 <td><?= mostrarValor($row["cidade"]) ?></td>
                 <td><?= mostrarValor($row["estado"]) ?></td>
-                <td><?= formatarData($row["created_at"]) ?></td>
                 <td>
                     <a class="botao-ver" href="ver.php?id=<?= (int)$row["id"] ?>">Visualizar</a>
                     <a class="botao-editar" href="editar.php?id=<?= (int)$row["id"] ?>">Editar</a>

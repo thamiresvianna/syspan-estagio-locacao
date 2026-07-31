@@ -65,7 +65,7 @@
     }
 ?>
 
-<h2>Excluir Item do Contrato Nº <?= numeroContrato($contrato['id_contrato']) ?></h2>
+<h2>Excluir Item do Contrato Nº <?= numeroContrato((int)$contrato['id']) ?></h2>
 
 <p>Tem certeza que deseja excluir o item: <strong><?= e($item["descricao"]) ?></strong> deste contrato?</p>
 

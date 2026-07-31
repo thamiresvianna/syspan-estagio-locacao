@@ -10,8 +10,7 @@
     $offset = ($pagina - 1) * $registros_pagina;
 
     $sql = 'SELECT contratos.id, clientes.nome AS cliente, clientes.cpf_cnpj, COUNT(contrato_itens.id) AS quantidade, 
-            precos.nome as tabela_preco, contratos.data_inicio, contratos.data_fim, contratos.status, contratos.created_at 
-            FROM contratos 
+            precos.nome as tabela_preco, contratos.data_inicio, contratos.data_fim, contratos.status FROM contratos 
             INNER JOIN clientes ON contratos.id_cliente = clientes.id
             LEFT JOIN contrato_itens ON contratos.id = contrato_itens.id_contrato
             LEFT JOIN precos ON contratos.id_preco = precos.id';
@@ -93,26 +92,24 @@
 <?php if(!empty($contratos)): ?>
     <table>
         <tr>
-            <th>ID</th>
+            <th>Nº Contrato</th>
             <th>Cliente</th>
             <th>CPF/CNPJ</th>
             <th>Equipamentos</th>
             <th>Tabela</th>
             <th>Status</th>
-            <th>Data de Cadastro</th>
             <th>Ações</th>
         </tr>
 
         <?php foreach($contratos as $row): ?>
             <?php $status_atual = calcularStatusContrato($row['data_inicio'], $row['data_fim']); ?>
             <tr>
-                <td><?= (int)$row["id"] ?></td>
+                <td><?= numeroContrato($row['id']) ?></td>
                 <td><?= e($row["cliente"]) ?></td>
                 <td><?= e(formatarCpfCnpj($row["cpf_cnpj"])) ?></td>
                 <td><?= e((int)($row["quantidade"])) ?><?= $row["quantidade"] == 1 ? ' equipamento' : ' equipamentos' ?></td>
                 <td><?= mostrarValor($row["tabela_preco"]) ?></td>
                 <td><span class="status <?= strtolower($status_atual) ?>"><?= e($status_atual) ?></span></td>
-                <td><?= formatarData($row["created_at"]) ?></td>
                 <td>
                     <a class="botao-ver" href="ver.php?id=<?= (int)$row["id"] ?>">Ver Itens</a>
                     <a class="botao-editar" href="editar.php?id=<?= (int)$row["id"] ?>">Editar</a>
