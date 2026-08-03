@@ -57,6 +57,12 @@ function atualizarTipoPessoa(limpar = false) {
     }
 }
 
+function mostrarErroCep(texto) {
+    limparEndereco();
+    mensagem.textContent = texto;
+    campo_cep.focus();
+}
+
 cpf_cnpj.addEventListener("input", function () {
     let valor = this.value.trim().replace(/\D/g, "");
 
@@ -122,10 +128,7 @@ async function buscarCep(cep) {
 
         if (dados.erro){
             ultimo_cep = "";
-            limparEndereco();
-                    
-            mensagem.textContent = "CEP não encontrado.";
-            campo_cep.focus();
+            mostrarErroCep("CEP não encontrado.");
             return;
         }
 
@@ -138,10 +141,8 @@ async function buscarCep(cep) {
     }
     catch(error) {
         ultimo_cep = "";
-        limparEndereco();
-
-        mensagem.textContent = "CEP não localizado.";
-        campo_cep.focus();
+        mostrarErroCep("CEP não localizado.");
+        return;
     }
     finally {
         campo_cep.readOnly = false;
@@ -158,9 +159,7 @@ campo_cep.addEventListener("blur", async function () {
 
     if(cep.length !== 8){
         ultimo_cep = "";
-        limparEndereco();
-
-        mensagem.textContent = "CEP deve conter 8 dígitos.";
+        mostrarErroCep("CEP deve conter 8 dígitos.");
         return;
     }
 

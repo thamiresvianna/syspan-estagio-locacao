@@ -16,13 +16,13 @@
         die("Contrato não encontrado.");
     }
 
-    $sql = 'SELECT id, nome FROM clientes';
+    $sql = 'SELECT id, nome FROM clientes ORDER BY nome ASC';
     $consulta = $pdo->prepare($sql);
     $consulta->execute();
 
     $clientes = $consulta->fetchAll();
 
-    $sql = 'SELECT id, nome FROM precos WHERE ativo = 1 OR id = :id_preco';
+    $sql = 'SELECT id, nome FROM precos WHERE ativo = 1 OR id = :id_preco ORDER BY nome ASC';
     $consulta = $pdo->prepare($sql);
     $consulta->execute([':id_preco' => $contrato['id_preco']]);
     $precos = $consulta->fetchAll();

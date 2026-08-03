@@ -3,13 +3,13 @@
     require_once '../logger.php';
     require_once '../helpers.php';
 
-    $sql = 'SELECT id, nome FROM clientes';
+    $sql = 'SELECT id, nome FROM clientes ORDER BY nome ASC';
     $consulta = $pdo->prepare($sql);
     $consulta->execute();
 
     $clientes = $consulta->fetchAll();
 
-    $sql = 'SELECT id, nome FROM precos WHERE ativo = 1';
+    $sql = 'SELECT id, nome FROM precos WHERE ativo = 1 ORDER BY nome ASC';
     $consulta = $pdo->prepare($sql);
     $consulta->execute();
     $precos = $consulta->fetchAll();
